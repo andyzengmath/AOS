@@ -1,5 +1,6 @@
 #include "list.h"
 #include "../debug.h"
+#include "threads/thread.h"
 
 /* Our doubly linked lists have two header elements: the "head"
    just before the first element and the "tail" just after the
@@ -30,6 +31,7 @@
    without sacrificing this simplicity.  But using two separate
    elements allows us to do a little bit of checking on some
    operations, which can be valuable.) */
+
 
 static bool is_sorted (struct list_elem *a, struct list_elem *b,
                        list_less_func *less, void *aux) UNUSED;
@@ -311,12 +313,29 @@ void list_reverse (struct list *list)
     }
 }
 
-int get_sorted_index (struct list *threads, struct thread *target) {
-  /* Your implementation here */
-  (void) threads;
-  (void) target;
-  return 0;
-}
+bool less_tid(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED) {  
+    return list_entry(a, struct thread, allelem)->tid < list_entry(b, struct thread, allelem)->tid;  
+}  
+
+int get_sorted_index (struct list *threads, struct thread *target) {  
+    if (threads == NULL || target == NULL)  
+        return -1;  
+      
+    list_sort(threads, less_tid, NULL);  
+    struct list_elem *e;  
+    int index = 0;  
+      
+    for (e = list_begin(threads); e != list_end(threads); e = list_next(e)) {  
+        struct thread *t = list_entry(e, struct thread, allelem);  
+        if (t->tid == target->tid) {  
+            return index;  
+        }  
+        index++;  
+    }  
+      
+    return -1;  
+}  
+
 
 /* Returns true only if the list elements A through B (exclusive)
    are in order according to LESS given auxiliary data AUX. */
