@@ -14,7 +14,8 @@ static void do_format (void);
 
 /* Initializes the file system module.
    If FORMAT is true, reformats the file system. */
-void filesys_init (bool format)
+void
+filesys_init (bool format) 
 {
   fs_device = block_get_role (BLOCK_FILESYS);
   if (fs_device == NULL)
@@ -23,7 +24,7 @@ void filesys_init (bool format)
   inode_init ();
   free_map_init ();
 
-  if (format)
+  if (format) 
     do_format ();
 
   free_map_open ();
@@ -31,23 +32,43 @@ void filesys_init (bool format)
 
 /* Shuts down the file system module, writing any unwritten data
    to disk. */
-void filesys_done (void) { free_map_close (); }
-
+void
+filesys_done (void) 
+{
+  free_map_close ();
+}
+
 /* Creates a file named NAME with the given INITIAL_SIZE.
    Returns true if successful, false otherwise.
    Fails if a file named NAME already exists,
    or if internal memory allocation fails. */
-bool filesys_create (const char *name, off_t initial_size)
+bool
+filesys_create (const char *name, off_t initial_size) 
 {
   block_sector_t inode_sector = 0;
   struct dir *dir = dir_open_root ();
-  bool success = (dir != NULL && free_map_allocate (1, &inode_sector) &&
-                  inode_create (inode_sector, initial_size) &&
-                  dir_add (dir, name, inode_sector));
-  if (!success && inode_sector != 0)
+  bool success = (dir != NULL
+                  && free_map_allocate (1, &inode_sector)
+                  && inode_create (inode_sector, initial_size)
+                  && dir_add (dir, name, inode_sector));
+  if (!success && inode_sector != 0) 
     free_map_release (inode_sector, 1);
-
   dir_close (dir);
+
+  return success;
+}
+
+/* Copy of filesys_create which allows the directory to be specified */
+bool
+filesys_create2 (const char *name, off_t initial_size, struct dir *dir) 
+{
+  block_sector_t inode_sector = 0;
+  bool success = (dir != NULL
+                  && free_map_allocate (1, &inode_sector)
+                  && inode_create (inode_sector, initial_size)
+                  && dir_add (dir, name, inode_sector));
+  if (!success && inode_sector != 0) 
+    free_map_release (inode_sector, 1);
 
   return success;
 }
@@ -57,7 +78,8 @@ bool filesys_create (const char *name, off_t initial_size)
    otherwise.
    Fails if no file named NAME exists,
    or if an internal memory allocation fails. */
-struct file *filesys_open (const char *name)
+struct file *
+filesys_open (const char *name)
 {
   struct dir *dir = dir_open_root ();
   struct inode *inode = NULL;
@@ -66,53 +88,55 @@ struct file *filesys_open (const char *name)
     dir_lookup (dir, name, &inode);
   dir_close (dir);
 
-  if (inode == NULL)
-    return NULL;
+  if ((inode != NULL) && inode_is_dir(inode)) {
+    return (struct file *) dir_open (inode);
+  } else {
+    return file_open (inode);
+  }
+}
 
-  if (inode_get_symlink (inode))
-    {
-      char target[15];
-      inode_read_at (inode, target, NAME_MAX + 1, 0);
-      struct dir *root = dir_open_root ();
-      if (!dir_lookup (root, target, &inode))
-        {
-          return NULL;
-        }
-      dir_close (root);
-    }
+/* Copy of filesys_create which allows the directory to be specified */
+struct file *
+filesys_open2 (const char *name, struct dir *dir)
+{
+  struct inode *inode = NULL;
 
-  return file_open (inode);
+  if (dir != NULL)
+    dir_lookup (dir, name, &inode);
+
+  if ((inode != NULL) && inode_is_dir(inode)) {
+    return (struct file *) dir_open (inode);
+  } else {
+    return file_open (inode);
+  }
 }
 
 /* Deletes the file named NAME.
    Returns true if successful, false on failure.
    Fails if no file named NAME exists,
    or if an internal memory allocation fails. */
-bool filesys_remove (const char *name)
+bool
+filesys_remove (const char *name) 
 {
   struct dir *dir = dir_open_root ();
   bool success = dir != NULL && dir_remove (dir, name);
-  dir_close (dir);
+  dir_close (dir); 
 
   return success;
 }
 
-/* Creates symbolic link LINKPATH to target file TARGET
-   Returns true if symbolic link created successfully,
-   false otherwise. */
-bool filesys_symlink (char *target, char *linkpath)
+bool
+filesys_remove2 (const char *name, struct dir *dir) 
 {
-  ASSERT (target != NULL && linkpath != NULL);
-  bool success = filesys_create (linkpath, 15);
-  struct file *symlink = filesys_open (linkpath);
-  inode_set_symlink (file_get_inode (symlink), true);
-  inode_write_at (file_get_inode (symlink), target, NAME_MAX + 1, 0);
-  file_close (symlink);
+  bool success = dir != NULL && dir_remove (dir, name);
+
   return success;
 }
 
+
 /* Formats the file system. */
-static void do_format (void)
+static void
+do_format (void)
 {
   printf ("Formatting file system...");
   free_map_create ();
