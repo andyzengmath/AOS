@@ -204,7 +204,7 @@ fsutil_append (char **argv)
         PANIC ("%s: out of space on scratch device", file_name);
       if (file_read (src, buffer, chunk_size) != chunk_size)
         PANIC ("%s: read failed with %"PROTd" bytes unread", file_name, size);
-      memset (buffer + chunk_size, 0, BLOCK_SECTOR_SIZE - chunk_size);
+      memset ((char *)buffer + chunk_size, 0, BLOCK_SECTOR_SIZE - chunk_size);
       block_write (dst, sector++, buffer);
       size -= chunk_size;
     }
@@ -214,7 +214,7 @@ fsutil_append (char **argv)
      them, though, in case we have more files to append. */
   memset (buffer, 0, BLOCK_SECTOR_SIZE);
   block_write (dst, sector, buffer);
-  block_write (dst, sector, buffer + 1);
+  block_write (dst, sector, (char *)buffer + 1);
 
   /* Finish up. */
   file_close (src);

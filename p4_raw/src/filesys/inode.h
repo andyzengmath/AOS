@@ -23,5 +23,7 @@ off_t inode_length (const struct inode *);
 bool inode_is_dir (const struct inode *);
 int inode_open_cnt (const struct inode *);
 int inode_number (const struct inode *);
+bool inode_get_symlink (struct inode *inode);
+void inode_set_symlink (struct inode *inode, bool is_symlink);
 
 #endif /* filesys/inode.h */

@@ -36,6 +36,8 @@ struct inode_disk
   {
     block_sector_t sectors[125];        /* Array of sectors, indirect,
                                            and double indirect blocks */
+    block_sector_t start; /* First data sector. */
+    bool is_symlink;      /* True if symbolic link, false otherwise. */
     bool is_dir;
     off_t length;                       /* File size in bytes. */
     unsigned magic;                     /* Magic number. */
@@ -598,4 +600,15 @@ int
 inode_number (const struct inode *inode)
 {
   return (int) inode->sector;
+}
+
+bool inode_get_symlink (struct inode *inode) { 
+  ASSERT (inode != NULL);
+  return inode->data.is_symlink; 
+}
+
+void inode_set_symlink (struct inode *inode, bool is_symlink)
+{
+  inode->data.is_symlink = is_symlink;
+  block_write (fs_device, inode->sector, &inode->data);
 }

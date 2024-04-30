@@ -145,3 +145,14 @@ do_format (void)
   free_map_close ();
   printf ("done.\n");
 }
+
+bool filesys_symlink (char *target, char *linkpath)
+{
+  ASSERT (target != NULL && linkpath != NULL);
+  bool success = filesys_create (linkpath, 15);
+  struct file *symlink = filesys_open (linkpath);
+  inode_set_symlink (file_get_inode (symlink), true);
+  inode_write_at (file_get_inode (symlink), target, NAME_MAX + 1, 0);
+  file_close (symlink);
+  return success;
+}
