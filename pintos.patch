@@ -1,5 +1,7 @@
+Binary files aos_pintos/.DS_Store and pintos-solution/.DS_Store differ
+Binary files aos_pintos/src/.DS_Store and pintos-solution/src/.DS_Store differ
 diff -ruN aos_pintos/src/devices/block.h pintos-solution/src/devices/block.h
---- aos_pintos/src/devices/block.h	2024-02-09 01:26:32.387938982 +0000
+--- aos_pintos/src/devices/block.h	2024-02-29 23:23:32.000000000 +0000
 +++ pintos-solution/src/devices/block.h	2024-03-31 05:11:50.000000000 +0000
 @@ -30,7 +30,7 @@
    BLOCK_FILESYS, /* File system. */
@@ -11,7 +13,7 @@ diff -ruN aos_pintos/src/devices/block.h pintos-solution/src/devices/block.h
    /* Other kinds of block devices that Pintos may see but does
       not interact with. */
 diff -ruN aos_pintos/src/filesys/directory.c pintos-solution/src/filesys/directory.c
---- aos_pintos/src/filesys/directory.c	2024-02-09 01:26:32.047953955 +0000
+--- aos_pintos/src/filesys/directory.c	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/directory.c	2024-04-30 04:36:05.000000000 +0000
 @@ -6,6 +6,8 @@
  #include "filesys/inode.h"
@@ -393,7 +395,7 @@ diff -ruN aos_pintos/src/filesys/directory.c pintos-solution/src/filesys/directo
 +// }
 +
 diff -ruN aos_pintos/src/filesys/directory.h pintos-solution/src/filesys/directory.h
---- aos_pintos/src/filesys/directory.h	2024-02-09 01:26:32.075952722 +0000
+--- aos_pintos/src/filesys/directory.h	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/directory.h	2024-04-30 04:34:42.000000000 +0000
 @@ -27,4 +27,11 @@
  bool dir_remove (struct dir *, const char *name);
@@ -408,7 +410,7 @@ diff -ruN aos_pintos/src/filesys/directory.h pintos-solution/src/filesys/directo
 +
  #endif /* filesys/directory.h */
 diff -ruN aos_pintos/src/filesys/file.c pintos-solution/src/filesys/file.c
---- aos_pintos/src/filesys/file.c	2024-02-09 01:26:32.083952370 +0000
+--- aos_pintos/src/filesys/file.c	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/file.c	2024-04-30 04:37:48.000000000 +0000
 @@ -142,4 +142,238 @@
  {
@@ -653,7 +655,7 @@ diff -ruN aos_pintos/src/filesys/file.c pintos-solution/src/filesys/file.c
 +// }
 \ No newline at end of file
 diff -ruN aos_pintos/src/filesys/file.h pintos-solution/src/filesys/file.h
---- aos_pintos/src/filesys/file.h	2024-02-09 01:26:32.063953250 +0000
+--- aos_pintos/src/filesys/file.h	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/file.h	2024-04-30 04:36:31.000000000 +0000
 @@ -12,6 +12,7 @@
    struct inode *inode; /* File's inode. */
@@ -664,7 +666,7 @@ diff -ruN aos_pintos/src/filesys/file.h pintos-solution/src/filesys/file.h
  
  /* Opening and closing files. */
 diff -ruN aos_pintos/src/filesys/filesys.c pintos-solution/src/filesys/filesys.c
---- aos_pintos/src/filesys/filesys.c	2024-02-09 01:26:32.063953250 +0000
+--- aos_pintos/src/filesys/filesys.c	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/filesys.c	2024-04-30 04:41:58.000000000 +0000
 @@ -7,6 +7,7 @@
  #include "filesys/inode.h"
@@ -847,38 +849,9 @@ diff -ruN aos_pintos/src/filesys/filesys.c pintos-solution/src/filesys/filesys.c
 +//   return true;
 +// }
 diff -ruN aos_pintos/src/filesys/filesys.h pintos-solution/src/filesys/filesys.h
---- aos_pintos/src/filesys/filesys.h	2024-02-09 01:26:32.059953426 +0000
+--- aos_pintos/src/filesys/filesys.h	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/filesys.h	2024-04-30 04:40:36.000000000 +0000
-@@ -2,7 +2,9 @@
- #define FILESYS_FILESYS_H
- 
- #include <stdbool.h>
-+#include <stddef.h>
- #include "filesys/off_t.h"
-+#include "devices/block.h"
- 
- /* Sectors of system file inodes. */
- #define FREE_MAP_SECTOR 0 /* Free map file inode sector. */
-@@ -11,6 +13,18 @@
- /* Block device that contains the file system. */
- extern struct block *fs_device;
- 
-+/* Count of allocated blocks. */
-+typedef uint32_t blkcnt_t;
-+
-+/* Struct containing file status. */
-+struct stat
-+{
-+    size_t logical_size;            /* The logical file size of a file. */
-+    size_t physical_size;           /* The physical file size of a file. */
-+    block_sector_t inode_number;    /* The inode number of a file. */
-+    blkcnt_t blocks;                /* Number of blocks allocated. */
-+};
-+
- void filesys_init (bool format);
- void filesys_done (void);
- bool filesys_create (const char *name, off_t initial_size);
-@@ -20,4 +34,12 @@
+@@ -34,4 +34,12 @@
  /* Symbolic link creation */
  bool filesys_symlink (char *target, char *linkpath);
  
@@ -892,7 +865,7 @@ diff -ruN aos_pintos/src/filesys/filesys.h pintos-solution/src/filesys/filesys.h
 +
  #endif /* filesys/filesys.h */
 diff -ruN aos_pintos/src/filesys/free-map.c pintos-solution/src/filesys/free-map.c
---- aos_pintos/src/filesys/free-map.c	2024-02-09 01:26:32.051953779 +0000
+--- aos_pintos/src/filesys/free-map.c	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/free-map.c	2024-04-30 04:42:51.000000000 +0000
 @@ -8,6 +8,8 @@
  static struct file *free_map_file; /* Free map file. */
@@ -1003,7 +976,7 @@ diff -ruN aos_pintos/src/filesys/free-map.c pintos-solution/src/filesys/free-map
 +//     PANIC ("can't write free map");
 +// }
 diff -ruN aos_pintos/src/filesys/fsutil.c pintos-solution/src/filesys/fsutil.c
---- aos_pintos/src/filesys/fsutil.c	2024-02-09 01:26:32.039954307 +0000
+--- aos_pintos/src/filesys/fsutil.c	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/fsutil.c	2024-04-30 04:44:01.000000000 +0000
 @@ -217,3 +217,218 @@
    file_close (src);
@@ -1225,7 +1198,7 @@ diff -ruN aos_pintos/src/filesys/fsutil.c pintos-solution/src/filesys/fsutil.c
 +//   free (buffer);
 +// }
 diff -ruN aos_pintos/src/filesys/inode.c pintos-solution/src/filesys/inode.c
---- aos_pintos/src/filesys/inode.c	2024-02-09 01:26:32.067953074 +0000
+--- aos_pintos/src/filesys/inode.c	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/inode.c	2024-04-30 04:40:00.000000000 +0000
 @@ -10,6 +10,12 @@
  /* Identifies an inode. */
@@ -1928,7 +1901,7 @@ diff -ruN aos_pintos/src/filesys/inode.c pintos-solution/src/filesys/inode.c
 +
 +
 diff -ruN aos_pintos/src/filesys/inode.h pintos-solution/src/filesys/inode.h
---- aos_pintos/src/filesys/inode.h	2024-02-09 01:26:32.047953955 +0000
+--- aos_pintos/src/filesys/inode.h	2024-02-29 23:23:29.000000000 +0000
 +++ pintos-solution/src/filesys/inode.h	2024-04-30 04:38:41.000000000 +0000
 @@ -22,4 +22,14 @@
  bool inode_get_symlink (struct inode *inode);
@@ -1945,1454 +1918,19 @@ diff -ruN aos_pintos/src/filesys/inode.h pintos-solution/src/filesys/inode.h
 +// bool inode_is_removed (const struct inode *);
 +
  #endif /* filesys/inode.h */
-diff -ruN aos_pintos/src/lib/build/Makefile pintos-solution/src/lib/build/Makefile
---- aos_pintos/src/lib/build/Makefile	2024-02-09 02:53:22.256912855 +0000
-+++ pintos-solution/src/lib/build/Makefile	1970-01-01 00:00:00.000000000 +0000
-@@ -1,113 +0,0 @@
--# -*- makefile -*-
--
--# WARNING: Only edit me in the src/ directory!  (not in build/!)
--
--SRCDIR = ../..
--
--all: kernel.bin loader.bin
--
--include ../../Make.config
--include ../Make.vars
--include ../../tests/Make.tests
--
--# Compiler and assembler options.
--kernel.bin: CPPFLAGS += -I$(SRCDIR)/lib/kernel
--
--# Core kernel.
--threads_SRC  = threads/start.S		# Startup code.
--threads_SRC += threads/init.c		# Main program.
--threads_SRC += threads/thread.c		# Thread management core.
--threads_SRC += threads/switch.S		# Thread switch routine.
--threads_SRC += threads/interrupt.c	# Interrupt core.
--threads_SRC += threads/intr-stubs.S	# Interrupt stubs.
--threads_SRC += threads/synch.c		# Synchronization.
--threads_SRC += threads/palloc.c		# Page allocator.
--threads_SRC += threads/malloc.c		# Subpage allocator.
--
--# Device driver code.
--devices_SRC  = devices/pit.c		# Programmable interrupt timer chip.
--devices_SRC += devices/timer.c		# Periodic timer device.
--devices_SRC += devices/kbd.c		# Keyboard device.
--devices_SRC += devices/vga.c		# Video device.
--devices_SRC += devices/serial.c		# Serial port device.
--devices_SRC += devices/block.c		# Block device abstraction layer.
--devices_SRC += devices/partition.c	# Partition block device.
--devices_SRC += devices/ide.c		# IDE disk block device.
--devices_SRC += devices/input.c		# Serial and keyboard input.
--devices_SRC += devices/intq.c		# Interrupt queue.
--devices_SRC += devices/rtc.c		# Real-time clock.
--devices_SRC += devices/shutdown.c	# Reboot and power off.
--devices_SRC += devices/speaker.c	# PC speaker.
--
--# Library code shared between kernel and user programs.
--lib_SRC  = lib/debug.c			# Debug helpers.
--lib_SRC += lib/random.c			# Pseudo-random numbers.
--lib_SRC += lib/stdio.c			# I/O library.
--lib_SRC += lib/stdlib.c			# Utility functions.
--lib_SRC += lib/string.c			# String functions.
--lib_SRC += lib/arithmetic.c		# 64-bit arithmetic for GCC.
--lib_SRC += lib/ustar.c			# Unix standard tar format utilities.
--
--# Kernel-specific library code.
--lib/kernel_SRC  = lib/kernel/debug.c	# Debug helpers.
--lib/kernel_SRC += lib/kernel/list.c	# Doubly-linked lists.
--lib/kernel_SRC += lib/kernel/bitmap.c	# Bitmaps.
--lib/kernel_SRC += lib/kernel/hash.c	# Hash tables.
--lib/kernel_SRC += lib/kernel/console.c	# printf(), putchar().
--
--# User process code.
--userprog_SRC  = userprog/process.c	# Process loading.
--userprog_SRC += userprog/pagedir.c	# Page directories.
--userprog_SRC += userprog/exception.c	# User exception handler.
--userprog_SRC += userprog/syscall.c	# System call handler.
--userprog_SRC += userprog/gdt.c		# GDT initialization.
--userprog_SRC += userprog/tss.c		# TSS management.
--
--# No virtual memory code yet.
--vm_SRC = vm/frame.c			# Some file.
--vm_SRC += vm/page.c			# Some file.
--vm_SRC += vm/swap.c			# Some file.
--
--# Filesystem code.
--filesys_SRC  = filesys/filesys.c	# Filesystem core.
--filesys_SRC += filesys/free-map.c	# Free sector bitmap.
--filesys_SRC += filesys/file.c		# Files.
--filesys_SRC += filesys/directory.c	# Directories.
--filesys_SRC += filesys/inode.c		# File headers.
--filesys_SRC += filesys/fsutil.c		# Utilities.
--
--SOURCES = $(foreach dir,$(KERNEL_SUBDIRS),$($(dir)_SRC))
--OBJECTS = $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(SOURCES)))
--DEPENDS = $(patsubst %.o,%.d,$(OBJECTS))
--
--threads/kernel.lds.s: CPPFLAGS += -P
--threads/kernel.lds.s: threads/kernel.lds.S threads/loader.h
--
--kernel.o: threads/kernel.lds.s $(OBJECTS) 
--	$(LD) -T $< -o $@ $(OBJECTS)
--
--kernel.bin: kernel.o
--	$(OBJCOPY) -R .note -R .comment -S $< $@
--
--threads/loader.o: threads/loader.S
--	$(CC) -c $< -o $@ $(ASFLAGS) $(CPPFLAGS) $(DEFINES)
--
--loader.bin: threads/loader.o
--	$(LD) -N -e 0 -Ttext 0x7c00 --oformat binary -o $@ $<
--
--os.dsk: kernel.bin
--	cat $^ > $@
--
--clean::
--	rm -f $(OBJECTS) $(DEPENDS) 
--	rm -f threads/loader.o threads/kernel.lds.s threads/loader.d
--	rm -f kernel.bin.tmp
--	rm -f kernel.o kernel.lds.s
--	rm -f kernel.bin loader.bin
--	rm -f bochsout.txt bochsrc.txt
--	rm -f results grade
--
--Makefile: $(SRCDIR)/Makefile.build
--	cp $< $@
--
---include $(DEPENDS)
-diff -ruN aos_pintos/src/lib/build/devices/block.d pintos-solution/src/lib/build/devices/block.d
---- aos_pintos/src/lib/build/devices/block.d	2024-02-09 02:53:23.148882564 +0000
-+++ pintos-solution/src/lib/build/devices/block.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,5 +0,0 @@
--devices/block.o: ../../devices/block.c ../../devices/block.h \
-- ../../lib/stddef.h ../../lib/inttypes.h ../../lib/stdint.h \
-- ../../lib/kernel/list.h ../../lib/stdbool.h ../../lib/string.h \
-- ../../lib/stdio.h ../../lib/debug.h ../../lib/stdarg.h \
-- ../../lib/kernel/stdio.h ../../devices/ide.h ../../threads/malloc.h
-Binary files aos_pintos/src/lib/build/devices/block.o and pintos-solution/src/lib/build/devices/block.o differ
-diff -ruN aos_pintos/src/lib/build/devices/ide.d pintos-solution/src/lib/build/devices/ide.d
---- aos_pintos/src/lib/build/devices/ide.d	2024-02-09 02:53:23.284877946 +0000
-+++ pintos-solution/src/lib/build/devices/ide.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,7 +0,0 @@
--devices/ide.o: ../../devices/ide.c ../../devices/ide.h ../../lib/ctype.h \
-- ../../lib/debug.h ../../lib/stdbool.h ../../lib/stdio.h \
-- ../../lib/stdarg.h ../../lib/stddef.h ../../lib/stdint.h \
-- ../../lib/kernel/stdio.h ../../devices/block.h ../../lib/inttypes.h \
-- ../../devices/partition.h ../../devices/timer.h ../../lib/round.h \
-- ../../threads/io.h ../../threads/interrupt.h ../../threads/synch.h \
-- ../../lib/kernel/list.h
-Binary files aos_pintos/src/lib/build/devices/ide.o and pintos-solution/src/lib/build/devices/ide.o differ
-diff -ruN aos_pintos/src/lib/build/devices/input.d pintos-solution/src/lib/build/devices/input.d
---- aos_pintos/src/lib/build/devices/input.d	2024-02-09 02:53:23.316876859 +0000
-+++ pintos-solution/src/lib/build/devices/input.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--devices/input.o: ../../devices/input.c ../../devices/input.h \
-- ../../lib/stdbool.h ../../lib/stdint.h ../../lib/debug.h \
-- ../../devices/intq.h ../../threads/interrupt.h ../../threads/synch.h \
-- ../../lib/kernel/list.h ../../lib/stddef.h ../../devices/serial.h
-Binary files aos_pintos/src/lib/build/devices/input.o and pintos-solution/src/lib/build/devices/input.o differ
-diff -ruN aos_pintos/src/lib/build/devices/intq.d pintos-solution/src/lib/build/devices/intq.d
---- aos_pintos/src/lib/build/devices/intq.d	2024-02-09 02:53:23.380874686 +0000
-+++ pintos-solution/src/lib/build/devices/intq.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--devices/intq.o: ../../devices/intq.c ../../devices/intq.h \
-- ../../threads/interrupt.h ../../lib/stdbool.h ../../lib/stdint.h \
-- ../../threads/synch.h ../../lib/kernel/list.h ../../lib/stddef.h \
-- ../../lib/debug.h ../../threads/thread.h
-Binary files aos_pintos/src/lib/build/devices/intq.o and pintos-solution/src/lib/build/devices/intq.o differ
-diff -ruN aos_pintos/src/lib/build/devices/kbd.d pintos-solution/src/lib/build/devices/kbd.d
---- aos_pintos/src/lib/build/devices/kbd.d	2024-02-09 02:53:22.992887862 +0000
-+++ pintos-solution/src/lib/build/devices/kbd.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,5 +0,0 @@
--devices/kbd.o: ../../devices/kbd.c ../../devices/kbd.h ../../lib/stdint.h \
-- ../../lib/ctype.h ../../lib/debug.h ../../lib/stdio.h ../../lib/stdarg.h \
-- ../../lib/stdbool.h ../../lib/stddef.h ../../lib/kernel/stdio.h \
-- ../../lib/string.h ../../devices/input.h ../../devices/shutdown.h \
-- ../../threads/interrupt.h ../../threads/io.h
-Binary files aos_pintos/src/lib/build/devices/kbd.o and pintos-solution/src/lib/build/devices/kbd.o differ
-diff -ruN aos_pintos/src/lib/build/devices/partition.d pintos-solution/src/lib/build/devices/partition.d
---- aos_pintos/src/lib/build/devices/partition.d	2024-02-09 02:53:23.196880934 +0000
-+++ pintos-solution/src/lib/build/devices/partition.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--devices/partition.o: ../../devices/partition.c ../../devices/partition.h \
-- ../../lib/packed.h ../../lib/stdlib.h ../../lib/stddef.h \
-- ../../lib/string.h ../../lib/stdio.h ../../lib/debug.h \
-- ../../lib/stdarg.h ../../lib/stdbool.h ../../lib/stdint.h \
-- ../../lib/kernel/stdio.h ../../devices/block.h ../../lib/inttypes.h \
-- ../../threads/malloc.h
-Binary files aos_pintos/src/lib/build/devices/partition.o and pintos-solution/src/lib/build/devices/partition.o differ
-diff -ruN aos_pintos/src/lib/build/devices/pit.d pintos-solution/src/lib/build/devices/pit.d
---- aos_pintos/src/lib/build/devices/pit.d	2024-02-09 02:53:22.880891664 +0000
-+++ pintos-solution/src/lib/build/devices/pit.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,3 +0,0 @@
--devices/pit.o: ../../devices/pit.c ../../devices/pit.h ../../lib/stdint.h \
-- ../../lib/debug.h ../../threads/interrupt.h ../../lib/stdbool.h \
-- ../../threads/io.h ../../lib/stddef.h
-Binary files aos_pintos/src/lib/build/devices/pit.o and pintos-solution/src/lib/build/devices/pit.o differ
-diff -ruN aos_pintos/src/lib/build/devices/rtc.d pintos-solution/src/lib/build/devices/rtc.d
---- aos_pintos/src/lib/build/devices/rtc.d	2024-02-09 02:53:23.420873328 +0000
-+++ pintos-solution/src/lib/build/devices/rtc.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--devices/rtc.o: ../../devices/rtc.c ../../devices/rtc.h ../../lib/round.h \
-- ../../lib/stdio.h ../../lib/debug.h ../../lib/stdarg.h \
-- ../../lib/stdbool.h ../../lib/stddef.h ../../lib/stdint.h \
-- ../../lib/kernel/stdio.h ../../threads/io.h
-Binary files aos_pintos/src/lib/build/devices/rtc.o and pintos-solution/src/lib/build/devices/rtc.o differ
-diff -ruN aos_pintos/src/lib/build/devices/serial.d pintos-solution/src/lib/build/devices/serial.d
---- aos_pintos/src/lib/build/devices/serial.d	2024-02-09 02:53:23.092884466 +0000
-+++ pintos-solution/src/lib/build/devices/serial.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--devices/serial.o: ../../devices/serial.c ../../devices/serial.h \
-- ../../lib/stdint.h ../../lib/debug.h ../../devices/input.h \
-- ../../lib/stdbool.h ../../devices/intq.h ../../threads/interrupt.h \
-- ../../threads/synch.h ../../lib/kernel/list.h ../../lib/stddef.h \
-- ../../devices/timer.h ../../lib/round.h ../../threads/io.h \
-- ../../threads/thread.h
-Binary files aos_pintos/src/lib/build/devices/serial.o and pintos-solution/src/lib/build/devices/serial.o differ
-diff -ruN aos_pintos/src/lib/build/devices/shutdown.d pintos-solution/src/lib/build/devices/shutdown.d
---- aos_pintos/src/lib/build/devices/shutdown.d	2024-02-09 02:53:23.464871833 +0000
-+++ pintos-solution/src/lib/build/devices/shutdown.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--devices/shutdown.o: ../../devices/shutdown.c ../../devices/shutdown.h \
-- ../../lib/debug.h ../../lib/kernel/console.h ../../lib/stdio.h \
-- ../../lib/stdarg.h ../../lib/stdbool.h ../../lib/stddef.h \
-- ../../lib/stdint.h ../../lib/kernel/stdio.h ../../devices/kbd.h \
-- ../../devices/serial.h ../../devices/timer.h ../../lib/round.h \
-- ../../threads/io.h ../../threads/thread.h ../../lib/kernel/list.h
-Binary files aos_pintos/src/lib/build/devices/shutdown.o and pintos-solution/src/lib/build/devices/shutdown.o differ
-diff -ruN aos_pintos/src/lib/build/devices/speaker.d pintos-solution/src/lib/build/devices/speaker.d
---- aos_pintos/src/lib/build/devices/speaker.d	2024-02-09 02:53:23.496870747 +0000
-+++ pintos-solution/src/lib/build/devices/speaker.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--devices/speaker.o: ../../devices/speaker.c ../../devices/speaker.h \
-- ../../devices/pit.h ../../lib/stdint.h ../../threads/io.h \
-- ../../lib/stddef.h ../../threads/interrupt.h ../../lib/stdbool.h \
-- ../../devices/timer.h ../../lib/round.h
-Binary files aos_pintos/src/lib/build/devices/speaker.o and pintos-solution/src/lib/build/devices/speaker.o differ
-diff -ruN aos_pintos/src/lib/build/devices/timer.d pintos-solution/src/lib/build/devices/timer.d
---- aos_pintos/src/lib/build/devices/timer.d	2024-02-09 02:53:22.944889491 +0000
-+++ pintos-solution/src/lib/build/devices/timer.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--devices/timer.o: ../../devices/timer.c ../../devices/timer.h \
-- ../../lib/round.h ../../lib/stdint.h ../../lib/debug.h \
-- ../../lib/inttypes.h ../../lib/stdio.h ../../lib/stdarg.h \
-- ../../lib/stdbool.h ../../lib/stddef.h ../../lib/kernel/stdio.h \
-- ../../devices/pit.h ../../threads/interrupt.h ../../threads/synch.h \
-- ../../lib/kernel/list.h ../../threads/thread.h
-Binary files aos_pintos/src/lib/build/devices/timer.o and pintos-solution/src/lib/build/devices/timer.o differ
-diff -ruN aos_pintos/src/lib/build/devices/vga.d pintos-solution/src/lib/build/devices/vga.d
---- aos_pintos/src/lib/build/devices/vga.d	2024-02-09 02:53:23.044886095 +0000
-+++ pintos-solution/src/lib/build/devices/vga.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,5 +0,0 @@
--devices/vga.o: ../../devices/vga.c ../../devices/vga.h ../../lib/round.h \
-- ../../lib/stdint.h ../../lib/stddef.h ../../lib/string.h \
-- ../../devices/speaker.h ../../threads/io.h ../../threads/interrupt.h \
-- ../../lib/stdbool.h ../../threads/vaddr.h ../../lib/debug.h \
-- ../../threads/loader.h
-Binary files aos_pintos/src/lib/build/devices/vga.o and pintos-solution/src/lib/build/devices/vga.o differ
-Binary files aos_pintos/src/lib/build/kernel.bin and pintos-solution/src/lib/build/kernel.bin differ
-Binary files aos_pintos/src/lib/build/kernel.o and pintos-solution/src/lib/build/kernel.o differ
-diff -ruN aos_pintos/src/lib/build/lib/arithmetic.d pintos-solution/src/lib/build/lib/arithmetic.d
---- aos_pintos/src/lib/build/lib/arithmetic.d	2024-02-09 02:53:23.864858251 +0000
-+++ pintos-solution/src/lib/build/lib/arithmetic.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--lib/arithmetic.o: ../../lib/arithmetic.c ../../lib/stdint.h
-Binary files aos_pintos/src/lib/build/lib/arithmetic.o and pintos-solution/src/lib/build/lib/arithmetic.o differ
-diff -ruN aos_pintos/src/lib/build/lib/debug.d pintos-solution/src/lib/build/lib/debug.d
---- aos_pintos/src/lib/build/lib/debug.d	2024-02-09 02:53:23.524869796 +0000
-+++ pintos-solution/src/lib/build/lib/debug.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,3 +0,0 @@
--lib/debug.o: ../../lib/debug.c ../../lib/debug.h ../../lib/stdarg.h \
-- ../../lib/stdbool.h ../../lib/stddef.h ../../lib/stdio.h \
-- ../../lib/stdint.h ../../lib/kernel/stdio.h ../../lib/string.h
-Binary files aos_pintos/src/lib/build/lib/debug.o and pintos-solution/src/lib/build/lib/debug.o differ
-diff -ruN aos_pintos/src/lib/build/lib/kernel/bitmap.d pintos-solution/src/lib/build/lib/kernel/bitmap.d
---- aos_pintos/src/lib/build/lib/kernel/bitmap.d	2024-02-09 02:53:24.152848471 +0000
-+++ pintos-solution/src/lib/build/lib/kernel/bitmap.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,5 +0,0 @@
--lib/kernel/bitmap.o: ../../lib/kernel/bitmap.c ../../lib/kernel/bitmap.h \
-- ../../lib/stdbool.h ../../lib/stddef.h ../../lib/inttypes.h \
-- ../../lib/stdint.h ../../lib/debug.h ../../lib/limits.h \
-- ../../lib/round.h ../../lib/stdio.h ../../lib/stdarg.h \
-- ../../lib/kernel/stdio.h ../../threads/malloc.h
-Binary files aos_pintos/src/lib/build/lib/kernel/bitmap.o and pintos-solution/src/lib/build/lib/kernel/bitmap.o differ
-diff -ruN aos_pintos/src/lib/build/lib/kernel/console.d pintos-solution/src/lib/build/lib/kernel/console.d
---- aos_pintos/src/lib/build/lib/kernel/console.d	2024-02-09 02:53:24.288843853 +0000
-+++ pintos-solution/src/lib/build/lib/kernel/console.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--lib/kernel/console.o: ../../lib/kernel/console.c \
-- ../../lib/kernel/console.h ../../lib/stdarg.h ../../lib/stdio.h \
-- ../../lib/debug.h ../../lib/stdbool.h ../../lib/stddef.h \
-- ../../lib/stdint.h ../../lib/kernel/stdio.h ../../devices/serial.h \
-- ../../devices/vga.h ../../threads/init.h ../../threads/interrupt.h \
-- ../../threads/synch.h ../../lib/kernel/list.h
-Binary files aos_pintos/src/lib/build/lib/kernel/console.o and pintos-solution/src/lib/build/lib/kernel/console.o differ
-diff -ruN aos_pintos/src/lib/build/lib/kernel/debug.d pintos-solution/src/lib/build/lib/kernel/debug.d
---- aos_pintos/src/lib/build/lib/kernel/debug.d	2024-02-09 02:53:23.956855126 +0000
-+++ pintos-solution/src/lib/build/lib/kernel/debug.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,7 +0,0 @@
--lib/kernel/debug.o: ../../lib/kernel/debug.c ../../lib/debug.h \
-- ../../lib/kernel/console.h ../../lib/stdarg.h ../../lib/stdbool.h \
-- ../../lib/stddef.h ../../lib/stdio.h ../../lib/stdint.h \
-- ../../lib/kernel/stdio.h ../../lib/string.h ../../threads/init.h \
-- ../../threads/interrupt.h ../../threads/thread.h ../../lib/kernel/list.h \
-- ../../threads/switch.h ../../threads/vaddr.h ../../threads/loader.h \
-- ../../devices/serial.h ../../devices/shutdown.h
-Binary files aos_pintos/src/lib/build/lib/kernel/debug.o and pintos-solution/src/lib/build/lib/kernel/debug.o differ
-diff -ruN aos_pintos/src/lib/build/lib/kernel/hash.d pintos-solution/src/lib/build/lib/kernel/hash.d
---- aos_pintos/src/lib/build/lib/kernel/hash.d	2024-02-09 02:53:24.240845483 +0000
-+++ pintos-solution/src/lib/build/lib/kernel/hash.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--lib/kernel/hash.o: ../../lib/kernel/hash.c ../../lib/kernel/hash.h \
-- ../../lib/stdbool.h ../../lib/stddef.h ../../lib/stdint.h \
-- ../../lib/kernel/list.h ../../lib/kernel/../debug.h \
-- ../../threads/malloc.h ../../lib/debug.h
-Binary files aos_pintos/src/lib/build/lib/kernel/hash.o and pintos-solution/src/lib/build/lib/kernel/hash.o differ
-diff -ruN aos_pintos/src/lib/build/lib/kernel/list.d pintos-solution/src/lib/build/lib/kernel/list.d
---- aos_pintos/src/lib/build/lib/kernel/list.d	2024-02-09 02:53:24.064851459 +0000
-+++ pintos-solution/src/lib/build/lib/kernel/list.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--lib/kernel/list.o: ../../lib/kernel/list.c ../../lib/kernel/list.h \
-- ../../lib/stdbool.h ../../lib/stddef.h ../../lib/stdint.h \
-- ../../lib/kernel/../debug.h ../../threads/thread.h ../../lib/debug.h \
-- ../../lib/kernel/list.h
-Binary files aos_pintos/src/lib/build/lib/kernel/list.o and pintos-solution/src/lib/build/lib/kernel/list.o differ
-diff -ruN aos_pintos/src/lib/build/lib/random.d pintos-solution/src/lib/build/lib/random.d
---- aos_pintos/src/lib/build/lib/random.d	2024-02-09 02:53:23.576868031 +0000
-+++ pintos-solution/src/lib/build/lib/random.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,2 +0,0 @@
--lib/random.o: ../../lib/random.c ../../lib/random.h ../../lib/stddef.h \
-- ../../lib/stdbool.h ../../lib/stdint.h ../../lib/debug.h
-Binary files aos_pintos/src/lib/build/lib/random.o and pintos-solution/src/lib/build/lib/random.o differ
-diff -ruN aos_pintos/src/lib/build/lib/stdio.d pintos-solution/src/lib/build/lib/stdio.d
---- aos_pintos/src/lib/build/lib/stdio.d	2024-02-09 02:53:23.680864499 +0000
-+++ pintos-solution/src/lib/build/lib/stdio.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--lib/stdio.o: ../../lib/stdio.c ../../lib/stdio.h ../../lib/debug.h \
-- ../../lib/stdarg.h ../../lib/stdbool.h ../../lib/stddef.h \
-- ../../lib/stdint.h ../../lib/kernel/stdio.h ../../lib/ctype.h \
-- ../../lib/inttypes.h ../../lib/round.h ../../lib/string.h
-Binary files aos_pintos/src/lib/build/lib/stdio.o and pintos-solution/src/lib/build/lib/stdio.o differ
-diff -ruN aos_pintos/src/lib/build/lib/stdlib.d pintos-solution/src/lib/build/lib/stdlib.d
---- aos_pintos/src/lib/build/lib/stdlib.d	2024-02-09 02:53:23.740862462 +0000
-+++ pintos-solution/src/lib/build/lib/stdlib.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,3 +0,0 @@
--lib/stdlib.o: ../../lib/stdlib.c ../../lib/ctype.h ../../lib/debug.h \
-- ../../lib/random.h ../../lib/stddef.h ../../lib/stdlib.h \
-- ../../lib/stdbool.h
-Binary files aos_pintos/src/lib/build/lib/stdlib.o and pintos-solution/src/lib/build/lib/stdlib.o differ
-diff -ruN aos_pintos/src/lib/build/lib/string.d pintos-solution/src/lib/build/lib/string.d
---- aos_pintos/src/lib/build/lib/string.d	2024-02-09 02:53:23.820859744 +0000
-+++ pintos-solution/src/lib/build/lib/string.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,2 +0,0 @@
--lib/string.o: ../../lib/string.c ../../lib/string.h ../../lib/stddef.h \
-- ../../lib/debug.h
-Binary files aos_pintos/src/lib/build/lib/string.o and pintos-solution/src/lib/build/lib/string.o differ
-diff -ruN aos_pintos/src/lib/build/lib/ustar.d pintos-solution/src/lib/build/lib/ustar.d
---- aos_pintos/src/lib/build/lib/ustar.d	2024-02-09 02:53:23.916856485 +0000
-+++ pintos-solution/src/lib/build/lib/ustar.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--lib/ustar.o: ../../lib/ustar.c ../../lib/ustar.h ../../lib/stdbool.h \
-- ../../lib/limits.h ../../lib/packed.h ../../lib/stdio.h \
-- ../../lib/debug.h ../../lib/stdarg.h ../../lib/stddef.h \
-- ../../lib/stdint.h ../../lib/kernel/stdio.h ../../lib/string.h
-Binary files aos_pintos/src/lib/build/lib/ustar.o and pintos-solution/src/lib/build/lib/ustar.o differ
-Binary files aos_pintos/src/lib/build/loader.bin and pintos-solution/src/lib/build/loader.bin differ
-diff -ruN aos_pintos/src/lib/build/results pintos-solution/src/lib/build/results
---- aos_pintos/src/lib/build/results	2024-02-09 02:53:33.144543112 +0000
-+++ pintos-solution/src/lib/build/results	1970-01-01 00:00:00.000000000 +0000
-@@ -1,4 +0,0 @@
--pass tests/lib/sorted-thread-list
--pass tests/lib/unsorted-thread-list
--pass tests/lib/bad-input
--pass tests/lib/not-found
-diff -ruN aos_pintos/src/lib/build/tests/lib/bad-input.output pintos-solution/src/lib/build/tests/lib/bad-input.output
---- aos_pintos/src/lib/build/tests/lib/bad-input.output	2024-02-09 02:53:32.532563896 +0000
-+++ pintos-solution/src/lib/build/tests/lib/bad-input.output	1970-01-01 00:00:00.000000000 +0000
-@@ -1,19 +0,0 @@
--qemu-system-i386 -device isa-debug-exit -drive file=/tmp/A7D2wtSd8h.dsk,format=raw,index=0,media=disk -m 4 -net none -nographic -monitor null
--PiLo hda1
--Loading.........
--Kernel command line: -q run bad-input
--Pintos booting with 3,968 kB RAM...
--367 pages available in kernel pool.
--367 pages available in user pool.
--Calibrating timer...  445,644,800 loops/s.
--Boot complete.
--Executing 'bad-input':
--(bad-input) begin
--(bad-input) sorted index -1
--(bad-input) end
--Execution of 'bad-input' complete.
--Timer: 31 ticks
--Thread: 0 idle ticks, 31 kernel ticks, 0 user ticks
--Console: 390 characters output
--Keyboard: 0 keys pressed
--Powering off...
-diff -ruN aos_pintos/src/lib/build/tests/lib/bad-input.result pintos-solution/src/lib/build/tests/lib/bad-input.result
---- aos_pintos/src/lib/build/tests/lib/bad-input.result	2024-02-09 02:53:32.580562266 +0000
-+++ pintos-solution/src/lib/build/tests/lib/bad-input.result	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--PASS
-diff -ruN aos_pintos/src/lib/build/tests/lib/listfunctests.d pintos-solution/src/lib/build/tests/lib/listfunctests.d
---- aos_pintos/src/lib/build/tests/lib/listfunctests.d	2024-02-09 02:53:24.332842359 +0000
-+++ pintos-solution/src/lib/build/tests/lib/listfunctests.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--tests/lib/listfunctests.o: ../../tests/lib/listfunctests.c \
-- ../../tests/lib/tests.h ../../threads/thread.h ../../lib/debug.h \
-- ../../lib/kernel/list.h ../../lib/stdbool.h ../../lib/stddef.h \
-- ../../lib/stdint.h ../../threads/malloc.h ../../lib/kernel/list.h \
-- ../../lib/string.h ../../lib/stdio.h ../../lib/stdarg.h \
-- ../../lib/kernel/stdio.h
-Binary files aos_pintos/src/lib/build/tests/lib/listfunctests.o and pintos-solution/src/lib/build/tests/lib/listfunctests.o differ
-diff -ruN aos_pintos/src/lib/build/tests/lib/not-found.output pintos-solution/src/lib/build/tests/lib/not-found.output
---- aos_pintos/src/lib/build/tests/lib/not-found.output	2024-02-09 02:53:33.080545285 +0000
-+++ pintos-solution/src/lib/build/tests/lib/not-found.output	1970-01-01 00:00:00.000000000 +0000
-@@ -1,19 +0,0 @@
--qemu-system-i386 -device isa-debug-exit -drive file=/tmp/2TQO6ayBMX.dsk,format=raw,index=0,media=disk -m 4 -net none -nographic -monitor null
--PiLo hda1
--Loading.........
--Kernel command line: -q run not-found
--Pintos booting with 3,968 kB RAM...
--367 pages available in kernel pool.
--367 pages available in user pool.
--Calibrating timer...  421,068,800 loops/s.
--Boot complete.
--Executing 'not-found':
--(not-found) begin
--(not-found) sorted index -1
--(not-found) end
--Execution of 'not-found' complete.
--Timer: 32 ticks
--Thread: 0 idle ticks, 32 kernel ticks, 0 user ticks
--Console: 390 characters output
--Keyboard: 0 keys pressed
--Powering off...
-diff -ruN aos_pintos/src/lib/build/tests/lib/not-found.result pintos-solution/src/lib/build/tests/lib/not-found.result
---- aos_pintos/src/lib/build/tests/lib/not-found.result	2024-02-09 02:53:33.136543384 +0000
-+++ pintos-solution/src/lib/build/tests/lib/not-found.result	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--PASS
-diff -ruN aos_pintos/src/lib/build/tests/lib/sorted-thread-list.output pintos-solution/src/lib/build/tests/lib/sorted-thread-list.output
---- aos_pintos/src/lib/build/tests/lib/sorted-thread-list.output	2024-02-09 02:53:31.444600844 +0000
-+++ pintos-solution/src/lib/build/tests/lib/sorted-thread-list.output	1970-01-01 00:00:00.000000000 +0000
-@@ -1,19 +0,0 @@
--qemu-system-i386 -device isa-debug-exit -drive file=/tmp/wvcA6Reo2W.dsk,format=raw,index=0,media=disk -m 4 -net none -nographic -monitor null
--PiLo hda1
--Loading.........
--Kernel command line: -q run sorted-thread-list
--Pintos booting with 3,968 kB RAM...
--367 pages available in kernel pool.
--367 pages available in user pool.
--Calibrating timer...  209,510,400 loops/s.
--Boot complete.
--Executing 'sorted-thread-list':
--(sorted-thread-list) begin
--(sorted-thread-list) sorted index 4
--(sorted-thread-list) end
--Execution of 'sorted-thread-list' complete.
--Timer: 21 ticks
--Thread: 0 idle ticks, 21 kernel ticks, 0 user ticks
--Console: 443 characters output
--Keyboard: 0 keys pressed
--Powering off...
-diff -ruN aos_pintos/src/lib/build/tests/lib/sorted-thread-list.result pintos-solution/src/lib/build/tests/lib/sorted-thread-list.result
---- aos_pintos/src/lib/build/tests/lib/sorted-thread-list.result	2024-02-09 02:53:31.500598943 +0000
-+++ pintos-solution/src/lib/build/tests/lib/sorted-thread-list.result	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--PASS
-diff -ruN aos_pintos/src/lib/build/tests/lib/unsorted-thread-list.output pintos-solution/src/lib/build/tests/lib/unsorted-thread-list.output
---- aos_pintos/src/lib/build/tests/lib/unsorted-thread-list.output	2024-02-09 02:53:31.992582235 +0000
-+++ pintos-solution/src/lib/build/tests/lib/unsorted-thread-list.output	1970-01-01 00:00:00.000000000 +0000
-@@ -1,19 +0,0 @@
--qemu-system-i386 -device isa-debug-exit -drive file=/tmp/isUgPNzLru.dsk,format=raw,index=0,media=disk -m 4 -net none -nographic -monitor null
--PiLo hda1
--Loading.........
--Kernel command line: -q run unsorted-thread-list
--Pintos booting with 3,968 kB RAM...
--367 pages available in kernel pool.
--367 pages available in user pool.
--Calibrating timer...  527,564,800 loops/s.
--Boot complete.
--Executing 'unsorted-thread-list':
--(unsorted-thread-list) begin
--(unsorted-thread-list) sorted index 6
--(unsorted-thread-list) end
--Execution of 'unsorted-thread-list' complete.
--Timer: 32 ticks
--Thread: 0 idle ticks, 32 kernel ticks, 0 user ticks
--Console: 455 characters output
--Keyboard: 0 keys pressed
--Powering off...
-diff -ruN aos_pintos/src/lib/build/tests/lib/unsorted-thread-list.result pintos-solution/src/lib/build/tests/lib/unsorted-thread-list.result
---- aos_pintos/src/lib/build/tests/lib/unsorted-thread-list.result	2024-02-09 02:53:32.040580604 +0000
-+++ pintos-solution/src/lib/build/tests/lib/unsorted-thread-list.result	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--PASS
-diff -ruN aos_pintos/src/lib/build/threads/init.d pintos-solution/src/lib/build/threads/init.d
---- aos_pintos/src/lib/build/threads/init.d	2024-02-09 02:53:22.424907148 +0000
-+++ pintos-solution/src/lib/build/threads/init.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,12 +0,0 @@
--threads/init.o: ../../threads/init.c ../../threads/init.h \
-- ../../lib/debug.h ../../lib/stdbool.h ../../lib/stddef.h \
-- ../../lib/stdint.h ../../lib/kernel/console.h ../../lib/inttypes.h \
-- ../../lib/limits.h ../../lib/random.h ../../lib/stdio.h \
-- ../../lib/stdarg.h ../../lib/kernel/stdio.h ../../lib/stdlib.h \
-- ../../lib/string.h ../../devices/kbd.h ../../devices/input.h \
-- ../../devices/serial.h ../../devices/shutdown.h ../../devices/timer.h \
-- ../../lib/round.h ../../devices/vga.h ../../devices/rtc.h \
-- ../../threads/interrupt.h ../../threads/io.h ../../threads/loader.h \
-- ../../threads/malloc.h ../../threads/palloc.h ../../threads/pte.h \
-- ../../threads/vaddr.h ../../threads/thread.h ../../lib/kernel/list.h \
-- ../../tests/threads/tests.h
-Binary files aos_pintos/src/lib/build/threads/init.o and pintos-solution/src/lib/build/threads/init.o differ
-diff -ruN aos_pintos/src/lib/build/threads/interrupt.d pintos-solution/src/lib/build/threads/interrupt.d
---- aos_pintos/src/lib/build/threads/interrupt.d	2024-02-09 02:53:22.616900629 +0000
-+++ pintos-solution/src/lib/build/threads/interrupt.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,7 +0,0 @@
--threads/interrupt.o: ../../threads/interrupt.c ../../threads/interrupt.h \
-- ../../lib/stdbool.h ../../lib/stdint.h ../../lib/debug.h \
-- ../../lib/inttypes.h ../../lib/stdio.h ../../lib/stdarg.h \
-- ../../lib/stddef.h ../../lib/kernel/stdio.h ../../threads/flags.h \
-- ../../threads/intr-stubs.h ../../threads/io.h ../../threads/thread.h \
-- ../../lib/kernel/list.h ../../threads/vaddr.h ../../threads/loader.h \
-- ../../devices/timer.h ../../lib/round.h
-Binary files aos_pintos/src/lib/build/threads/interrupt.o and pintos-solution/src/lib/build/threads/interrupt.o differ
-diff -ruN aos_pintos/src/lib/build/threads/intr-stubs.d pintos-solution/src/lib/build/threads/intr-stubs.d
---- aos_pintos/src/lib/build/threads/intr-stubs.d	2024-02-09 02:53:22.632900086 +0000
-+++ pintos-solution/src/lib/build/threads/intr-stubs.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--threads/intr-stubs.o: ../../threads/intr-stubs.S ../../threads/loader.h
-Binary files aos_pintos/src/lib/build/threads/intr-stubs.o and pintos-solution/src/lib/build/threads/intr-stubs.o differ
-diff -ruN aos_pintos/src/lib/build/threads/kernel.lds.s pintos-solution/src/lib/build/threads/kernel.lds.s
---- aos_pintos/src/lib/build/threads/kernel.lds.s	2024-02-09 02:53:22.348909730 +0000
-+++ pintos-solution/src/lib/build/threads/kernel.lds.s	1970-01-01 00:00:00.000000000 +0000
-@@ -1,21 +0,0 @@
--OUTPUT_FORMAT("elf32-i386")
--OUTPUT_ARCH("i386")
--ENTRY(start)
--SECTIONS
--{
--  _start = 0xc0000000 + 0x20000;
--  . = _start + SIZEOF_HEADERS;
--  .text : { *(.start) *(.text) } = 0x90
--  .rodata : { *(.rodata) *(.rodata.*)
--       . = ALIGN(0x1000);
--       _end_kernel_text = .; }
--  .eh_frame : { *(.eh_frame) }
--  .data : { *(.data)
--     _signature = .; LONG(0xaa55aa55) }
--  .plt : { *(.plt*) }
--  _start_bss = .;
--  .bss : { *(.bss) }
--  _end_bss = .;
--  _end = .;
--  ASSERT (_end - _start <= 512K, "Kernel image is too big.")
--}
-Binary files aos_pintos/src/lib/build/threads/loader.o and pintos-solution/src/lib/build/threads/loader.o differ
-diff -ruN aos_pintos/src/lib/build/threads/malloc.d pintos-solution/src/lib/build/threads/malloc.d
---- aos_pintos/src/lib/build/threads/malloc.d	2024-02-09 02:53:22.844892887 +0000
-+++ pintos-solution/src/lib/build/threads/malloc.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--threads/malloc.o: ../../threads/malloc.c ../../threads/malloc.h \
-- ../../lib/debug.h ../../lib/stddef.h ../../lib/kernel/list.h \
-- ../../lib/stdbool.h ../../lib/stdint.h ../../lib/round.h \
-- ../../lib/stdio.h ../../lib/stdarg.h ../../lib/kernel/stdio.h \
-- ../../lib/string.h ../../threads/palloc.h ../../threads/synch.h \
-- ../../threads/vaddr.h ../../threads/loader.h
-Binary files aos_pintos/src/lib/build/threads/malloc.o and pintos-solution/src/lib/build/threads/malloc.o differ
-diff -ruN aos_pintos/src/lib/build/threads/palloc.d pintos-solution/src/lib/build/threads/palloc.d
---- aos_pintos/src/lib/build/threads/palloc.d	2024-02-09 02:53:22.776895195 +0000
-+++ pintos-solution/src/lib/build/threads/palloc.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,6 +0,0 @@
--threads/palloc.o: ../../threads/palloc.c ../../threads/palloc.h \
-- ../../lib/stddef.h ../../lib/kernel/bitmap.h ../../lib/stdbool.h \
-- ../../lib/inttypes.h ../../lib/stdint.h ../../lib/debug.h \
-- ../../lib/round.h ../../lib/stdio.h ../../lib/stdarg.h \
-- ../../lib/kernel/stdio.h ../../lib/string.h ../../threads/loader.h \
-- ../../threads/synch.h ../../lib/kernel/list.h ../../threads/vaddr.h
-Binary files aos_pintos/src/lib/build/threads/palloc.o and pintos-solution/src/lib/build/threads/palloc.o differ
-diff -ruN aos_pintos/src/lib/build/threads/start.d pintos-solution/src/lib/build/threads/start.d
---- aos_pintos/src/lib/build/threads/start.d	2024-02-09 02:53:22.352909594 +0000
-+++ pintos-solution/src/lib/build/threads/start.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--threads/start.o: ../../threads/start.S ../../threads/loader.h
-Binary files aos_pintos/src/lib/build/threads/start.o and pintos-solution/src/lib/build/threads/start.o differ
-diff -ruN aos_pintos/src/lib/build/threads/switch.d pintos-solution/src/lib/build/threads/switch.d
---- aos_pintos/src/lib/build/threads/switch.d	2024-02-09 02:53:22.532903481 +0000
-+++ pintos-solution/src/lib/build/threads/switch.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1 +0,0 @@
--threads/switch.o: ../../threads/switch.S ../../threads/switch.h
-Binary files aos_pintos/src/lib/build/threads/switch.o and pintos-solution/src/lib/build/threads/switch.o differ
-diff -ruN aos_pintos/src/lib/build/threads/synch.d pintos-solution/src/lib/build/threads/synch.d
---- aos_pintos/src/lib/build/threads/synch.d	2024-02-09 02:53:22.716897233 +0000
-+++ pintos-solution/src/lib/build/threads/synch.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,5 +0,0 @@
--threads/synch.o: ../../threads/synch.c ../../threads/synch.h \
-- ../../lib/kernel/list.h ../../lib/stdbool.h ../../lib/stddef.h \
-- ../../lib/stdint.h ../../lib/stdio.h ../../lib/debug.h \
-- ../../lib/stdarg.h ../../lib/kernel/stdio.h ../../lib/string.h \
-- ../../threads/interrupt.h ../../threads/thread.h
-Binary files aos_pintos/src/lib/build/threads/synch.o and pintos-solution/src/lib/build/threads/synch.o differ
-diff -ruN aos_pintos/src/lib/build/threads/thread.d pintos-solution/src/lib/build/threads/thread.d
---- aos_pintos/src/lib/build/threads/thread.d	2024-02-09 02:53:22.512904161 +0000
-+++ pintos-solution/src/lib/build/threads/thread.d	1970-01-01 00:00:00.000000000 +0000
-@@ -1,7 +0,0 @@
--threads/thread.o: ../../threads/thread.c ../../threads/thread.h \
-- ../../lib/debug.h ../../lib/kernel/list.h ../../lib/stdbool.h \
-- ../../lib/stddef.h ../../lib/stdint.h ../../lib/random.h \
-- ../../lib/stdio.h ../../lib/stdarg.h ../../lib/kernel/stdio.h \
-- ../../lib/string.h ../../threads/flags.h ../../threads/interrupt.h \
-- ../../threads/intr-stubs.h ../../threads/palloc.h ../../threads/switch.h \
-- ../../threads/synch.h ../../threads/vaddr.h ../../threads/loader.h
-Binary files aos_pintos/src/lib/build/threads/thread.o and pintos-solution/src/lib/build/threads/thread.o differ
-diff -ruN aos_pintos/src/lib/kernel/list.c pintos-solution/src/lib/kernel/list.c
---- aos_pintos/src/lib/kernel/list.c	2024-02-09 02:53:00.329657376 +0000
-+++ pintos-solution/src/lib/kernel/list.c	2024-03-31 05:11:50.000000000 +0000
-@@ -1,6 +1,5 @@
- #include "list.h"
- #include "../debug.h"
--#include "threads/thread.h"
- 
- /* Our doubly linked lists have two header elements: the "head"
-    just before the first element and the "tail" just after the
-@@ -32,7 +31,6 @@
-    elements allows us to do a little bit of checking on some
-    operations, which can be valuable.) */
- 
--
- static bool is_sorted (struct list_elem *a, struct list_elem *b,
-                        list_less_func *less, void *aux) UNUSED;
- 
-@@ -313,29 +311,12 @@
-     }
- }
- 
--bool less_tid(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED) {  
--    return list_entry(a, struct thread, allelem)->tid < list_entry(b, struct thread, allelem)->tid;  
--}  
--
--int get_sorted_index (struct list *threads, struct thread *target) {  
--    if (threads == NULL || target == NULL)  
--        return -1;  
--      
--    list_sort(threads, less_tid, NULL);  
--    struct list_elem *e;  
--    int index = 0;  
--      
--    for (e = list_begin(threads); e != list_end(threads); e = list_next(e)) {  
--        struct thread *t = list_entry(e, struct thread, allelem);  
--        if (t->tid == target->tid) {  
--            return index;  
--        }  
--        index++;  
--    }  
--      
--    return -1;  
--}  
--
-+int get_sorted_index (struct list *threads, struct thread *target) {
-+  /* Your implementation here */
-+  (void) threads;
-+  (void) target;
-+  return 0;
-+}
- 
- /* Returns true only if the list elements A through B (exclusive)
-    are in order according to LESS given auxiliary data AUX. */
-diff -ruN aos_pintos/src/tests/filesys/extended/Make.tests pintos-solution/src/tests/filesys/extended/Make.tests
---- aos_pintos/src/tests/filesys/extended/Make.tests	2024-02-09 01:26:31.467979510 +0000
-+++ pintos-solution/src/tests/filesys/extended/Make.tests	2024-03-31 05:11:40.000000000 +0000
-@@ -6,7 +6,10 @@
- grow-file-size grow-root-lg grow-root-sm grow-seq-lg grow-seq-sm	\
- grow-sparse grow-tell grow-two-files syn-rw
- 
-+add_tests = check-stat check-sparse
-+
- tests/filesys/extended_TESTS = $(patsubst %,tests/filesys/extended/%,$(raw_tests))
-+tests/filesys/extended_TESTS += $(patsubst %,tests/filesys/extended/%,$(add_tests))
- tests/filesys/extended_EXTRA_GRADES = $(patsubst %,tests/filesys/extended/%-persistence,$(raw_tests))
- 
- tests/filesys/extended_PROGS = $(tests/filesys/extended_TESTS) \
-diff -ruN aos_pintos/src/tests/filesys/extended/Rubric.functionality pintos-solution/src/tests/filesys/extended/Rubric.functionality
---- aos_pintos/src/tests/filesys/extended/Rubric.functionality	2024-02-09 01:26:31.515977395 +0000
-+++ pintos-solution/src/tests/filesys/extended/Rubric.functionality	2024-03-31 05:11:42.000000000 +0000
-@@ -24,3 +24,7 @@
- 
- - Test writing from multiple processes.
- 5	syn-rw
-+
-+- Test stat() and sparse files
-+1	check-stat
-+1	check-sparse
-\ No newline at end of file
-diff -ruN aos_pintos/src/tests/filesys/extended/check-sparse.c pintos-solution/src/tests/filesys/extended/check-sparse.c
---- aos_pintos/src/tests/filesys/extended/check-sparse.c	1970-01-01 00:00:00.000000000 +0000
-+++ pintos-solution/src/tests/filesys/extended/check-sparse.c	2024-03-31 05:11:42.000000000 +0000
-@@ -0,0 +1,61 @@
-+/* Ensure that disk blocks aren't being allocated
-+   until file explicitly written to for sparse
-+   files implementation. */
-+
-+#include <random.h>
-+#include <stdio.h>
-+#include <syscall.h>
-+#include "tests/lib.h"
-+#include "tests/main.h"
-+
-+void test_main (void)
-+{
-+  const unsigned int BUF_SIZE = 16;
-+  const char FILE_NAME[] = "yoit";
-+  int fd;
-+  int ret;
-+  char buf[BUF_SIZE];
-+
-+  int exp_log_size = 512;
-+  int exp_phys_size = 0;
-+  int exp_blocks = 0;
-+
-+  // Create file
-+  CHECK (create (FILE_NAME, exp_log_size), "create \"%s\"", FILE_NAME);
-+  CHECK ((fd = open (FILE_NAME)) > 1, "open \"%s\"", FILE_NAME);
-+  CHECK ((ret = stat (FILE_NAME, buf)) == 0,
-+         "return 0 from stat() call on \"%s\"", FILE_NAME);
-+
-+  // Check initial file status
-+  int logical_size = *((int *) buf);
-+  int physical_size = *((int *) buf + 1);
-+  int inode_number = *((int *) buf + 2);
-+  int blocks = *((int *) buf + 3);
-+
-+  msg ("should have %d logical size: actual %d", exp_log_size, logical_size);
-+  msg ("should have %d physical size: actual %d", exp_phys_size, physical_size);
-+  CHECK (inode_number > 0, "valid inode number");
-+  msg ("should have %d block: actual %d", exp_blocks, blocks);
-+
-+  // Now let's write some random, non-zero bytes and check file status
-+  const int RAND_BYTES = 500;
-+  char buf1[RAND_BYTES];
-+  random_bytes (buf1, RAND_BYTES);
-+  CHECK (write (fd, buf1, RAND_BYTES), "write random bytes to \"%s\"",
-+         FILE_NAME);
-+  CHECK ((ret = stat (FILE_NAME, buf)) == 0,
-+         "return 0 from stat() call on \"%s\"", FILE_NAME);
-+
-+  exp_phys_size = 500;
-+  exp_blocks = 1;
-+
-+  logical_size = *((int *) buf);
-+  physical_size = *((int *) buf + 1);
-+  inode_number = *((int *) buf + 2);
-+  blocks = *((int *) buf + 3);
-+
-+  msg ("should have %d logical size: actual %d", exp_log_size, logical_size);
-+  msg ("should have %d physical size: actual %d", exp_phys_size, physical_size);
-+  CHECK (inode_number > 0, "valid inode number");
-+  msg ("should have %d block: actual %d", exp_blocks, blocks);
-+}
-\ No newline at end of file
-diff -ruN aos_pintos/src/tests/filesys/extended/check-sparse.ck pintos-solution/src/tests/filesys/extended/check-sparse.ck
---- aos_pintos/src/tests/filesys/extended/check-sparse.ck	1970-01-01 00:00:00.000000000 +0000
-+++ pintos-solution/src/tests/filesys/extended/check-sparse.ck	2024-03-31 05:11:40.000000000 +0000
-@@ -0,0 +1,22 @@
-+# -*- perl -*-
-+use strict;
-+use warnings;
-+use tests::tests;
-+check_expected (IGNORE_EXIT_CODES => 1, [<<'EOF']);
-+(check-sparse) begin
-+(check-sparse) create "yoit"
-+(check-sparse) open "yoit"
-+(check-sparse) return 0 from stat() call on "yoit"
-+(check-sparse) should have 512 logical size: actual 512
-+(check-sparse) should have 0 physical size: actual 0
-+(check-sparse) valid inode number
-+(check-sparse) should have 0 block: actual 0
-+(check-sparse) write random bytes to "yoit"
-+(check-sparse) return 0 from stat() call on "yoit"
-+(check-sparse) should have 512 logical size: actual 512
-+(check-sparse) should have 500 physical size: actual 500
-+(check-sparse) valid inode number
-+(check-sparse) should have 1 block: actual 1
-+(check-sparse) end
-+EOF
-+pass;
-diff -ruN aos_pintos/src/tests/filesys/extended/check-stat.c pintos-solution/src/tests/filesys/extended/check-stat.c
---- aos_pintos/src/tests/filesys/extended/check-stat.c	1970-01-01 00:00:00.000000000 +0000
-+++ pintos-solution/src/tests/filesys/extended/check-stat.c	2024-03-31 05:11:40.000000000 +0000
-@@ -0,0 +1,36 @@
-+/* Checks basic functionality of stat() system call. */
-+
-+#include <random.h>
-+#include <stdio.h>
-+#include <syscall.h>
-+#include "tests/lib.h"
-+#include "tests/main.h"
-+
-+void test_main (void)
-+{
-+  const unsigned int BUF_SIZE = 16;
-+  const char FILE_NAME[] = "yoit";
-+  int fd;
-+  int ret;
-+  char buf[BUF_SIZE];
-+
-+  int exp_log_size = 512;
-+  int exp_phys_size = 0;
-+  int exp_blocks = 0;
-+
-+  // Create file and check file status
-+  CHECK (create (FILE_NAME, exp_log_size), "create \"%s\"", FILE_NAME);
-+  CHECK ((fd = open (FILE_NAME)) > 1, "open \"%s\"", FILE_NAME);
-+  CHECK ((ret = stat (FILE_NAME, buf)) == 0,
-+         "return 0 from stat() call on \"%s\"", FILE_NAME);
-+
-+  int logical_size = *((int *) buf);
-+  int physical_size = *((int *) buf + 1);
-+  int inode_number = *((int *) buf + 2);
-+  int blocks = *((int *) buf + 3);
-+
-+  msg ("should have %d logical size: actual %d", exp_log_size, logical_size);
-+  msg ("should have %d physical size: actual %d", exp_phys_size, physical_size);
-+  CHECK (inode_number > 0, "valid inode number");
-+  msg ("should have %d block: actual %d", exp_blocks, blocks);
-+}
-\ No newline at end of file
-diff -ruN aos_pintos/src/tests/filesys/extended/check-stat.ck pintos-solution/src/tests/filesys/extended/check-stat.ck
---- aos_pintos/src/tests/filesys/extended/check-stat.ck	1970-01-01 00:00:00.000000000 +0000
-+++ pintos-solution/src/tests/filesys/extended/check-stat.ck	2024-03-31 05:11:40.000000000 +0000
-@@ -0,0 +1,16 @@
-+# -*- perl -*-
-+use strict;
-+use warnings;
-+use tests::tests;
-+check_expected (IGNORE_EXIT_CODES => 1, [<<'EOF']);
-+(check-stat) begin
-+(check-stat) create "yoit"
-+(check-stat) open "yoit"
-+(check-stat) return 0 from stat() call on "yoit"
-+(check-stat) should have 512 logical size: actual 512
-+(check-stat) should have 0 physical size: actual 0
-+(check-stat) valid inode number
-+(check-stat) should have 0 block: actual 0
-+(check-stat) end
-+EOF
-+pass;
-diff -ruN aos_pintos/src/tests/threads/Make.tests pintos-solution/src/tests/threads/Make.tests
---- aos_pintos/src/tests/threads/Make.tests	2024-02-09 01:26:31.699969288 +0000
-+++ pintos-solution/src/tests/threads/Make.tests	2024-03-31 05:11:44.000000000 +0000
-@@ -4,14 +4,13 @@
- tests/threads_TESTS = $(addprefix tests/threads/,alarm-single		\
- alarm-multiple alarm-simultaneous alarm-priority alarm-zero		\
- alarm-negative priority-change priority-donate-one			\
--priority-donate-one-sema        \
--priority-donate-multiple priority-donate-multiple-sema      \
-+priority-donate-multiple       \
- priority-donate-multiple2			\
--priority-donate-nest priority-donate-nest-sema          \
-+priority-donate-nest           \
- priority-donate-sema       \
--priority-donate-lower priority-donate-lower-sema		\
-+priority-donate-lower 		\
- priority-fifo priority-preempt priority-sema priority-condvar		\
--priority-donate-chain priority-donate-chain-sema)
-+priority-donate-chain )
- 
- # Sources for tests.
- tests/threads_SRC  = tests/threads/tests.c
-@@ -22,20 +21,14 @@
- tests/threads_SRC += tests/threads/alarm-negative.c
- tests/threads_SRC += tests/threads/priority-change.c
- tests/threads_SRC += tests/threads/priority-donate-one.c
--tests/threads_SRC += tests/threads/priority-donate-one-sema.c
- tests/threads_SRC += tests/threads/priority-donate-multiple.c
--tests/threads_SRC += tests/threads/priority-donate-multiple-sema.c
- tests/threads_SRC += tests/threads/priority-donate-multiple2.c
- tests/threads_SRC += tests/threads/priority-donate-nest.c
--tests/threads_SRC += tests/threads/priority-donate-nest-sema.c
- tests/threads_SRC += tests/threads/priority-donate-sema.c
- tests/threads_SRC += tests/threads/priority-donate-lower.c
--tests/threads_SRC += tests/threads/priority-donate-lower-sema.c
- tests/threads_SRC += tests/threads/priority-fifo.c
- tests/threads_SRC += tests/threads/priority-preempt.c
- tests/threads_SRC += tests/threads/priority-sema.c
- tests/threads_SRC += tests/threads/priority-condvar.c
- tests/threads_SRC += tests/threads/priority-donate-chain.c
--tests/threads_SRC += tests/threads/priority-donate-chain-sema.c
--
- 
-diff -ruN aos_pintos/src/tests/threads/priority-donate-chain-sema.c pintos-solution/src/tests/threads/priority-donate-chain-sema.c
---- aos_pintos/src/tests/threads/priority-donate-chain-sema.c	2024-02-09 01:26:31.723968230 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-chain-sema.c	1970-01-01 00:00:00.000000000 +0000
-@@ -1,107 +0,0 @@
--/* The main thread set its priority to PRI_MIN and creates 7 threads
--   (thread 1..7) with priorities PRI_MIN + 3, 6, 9, 12, ...
--   The main thread initializes 8 locks: lock 0..7 and acquires lock 0.
--
--   When thread[i] starts, it first acquires lock[i] (unless i == 7.)
--   Subsequently, thread[i] attempts to acquire lock[i-1], which is held by
--   thread[i-1], except for lock[0], which is held by the main thread.
--   Because the lock is held, thread[i] donates its priority to thread[i-1],
--   which donates to thread[i-2], and so on until the main thread
--   receives the donation.
--
--   After threads[1..7] have been created and are blocked on locks[0..7],
--   the main thread releases lock[0], unblocking thread[1], and being
--   preempted by it.
--   Thread[1] then completes acquiring lock[0], then releases lock[0],
--   then releases lock[1], unblocking thread[2], etc.
--   Thread[7] finally acquires & releases lock[7] and exits, allowing
--   thread[6], then thread[5] etc. to run and exit until finally the
--   main thread exits.
--
--   In addition, interloper threads are created at priority levels
--   p = PRI_MIN + 2, 5, 8, 11, ... which should not be run until the
--   corresponding thread with priority p + 1 has finished.
--
--   Written by Godmar Back <gback@cs.vt.edu> */
--
--#include <stdio.h>
--#include "tests/threads/tests.h"
--#include "threads/init.h"
--#include "threads/synch.h"
--#include "threads/thread.h"
--
--#define NESTING_DEPTH 8
--
--struct sema_pair
--{
--  struct semaphore *second;
--  struct semaphore *first;
--};
--
--static thread_func donor_thread_func;
--static thread_func interloper_thread_func;
--
--void test_priority_donate_chain_sema (void)
--{
--  int i;
--  struct semaphore semas[NESTING_DEPTH - 1];
--  struct sema_pair sema_pairs[NESTING_DEPTH];
--
--  thread_set_priority (PRI_MIN);
--
--  for (i = 0; i < NESTING_DEPTH - 1; i++)
--    sema_init (&semas[i], 1);
--
--  sema_down (&semas[0]);
--  msg ("%s downed semaphore.", thread_name ());
--
--  for (i = 1; i < NESTING_DEPTH; i++)
--    {
--      char name[16];
--      int thread_priority;
--
--      snprintf (name, sizeof name, "thread %d", i);
--      thread_priority = PRI_MIN + i * 3;
--      sema_pairs[i].first = i < NESTING_DEPTH - 1 ? semas + i : NULL;
--      sema_pairs[i].second = semas + i - 1;
--
--      thread_create (name, thread_priority, donor_thread_func, sema_pairs + i);
--      msg ("%s should have priority %d.  Actual priority: %d.", thread_name (),
--           thread_priority, thread_get_priority ());
--
--      snprintf (name, sizeof name, "interloper %d", i);
--      thread_create (name, thread_priority - 1, interloper_thread_func, NULL);
--    }
--
--  sema_up (&semas[0]);
--  msg ("%s finishing with priority %d.", thread_name (),
--       thread_get_priority ());
--}
--
--static void donor_thread_func (void *semas_)
--{
--  struct sema_pair *semas = semas_;
--
--  if (semas->first)
--    sema_down (semas->first);
--
--  sema_down (semas->second);
--  msg ("%s downed semaphore", thread_name ());
--
--  sema_up (semas->second);
--  msg ("%s should have priority %d. Actual priority: %d", thread_name (),
--       (NESTING_DEPTH - 1) * 3, thread_get_priority ());
--
--  if (semas->first)
--    sema_up (semas->first);
--
--  msg ("%s finishing with priority %d.", thread_name (),
--       thread_get_priority ());
--}
--
--static void interloper_thread_func (void *arg_ UNUSED)
--{
--  msg ("%s finished.", thread_name ());
--}
--
--// vim: sw=2
-diff -ruN aos_pintos/src/tests/threads/priority-donate-chain-sema.ck pintos-solution/src/tests/threads/priority-donate-chain-sema.ck
---- aos_pintos/src/tests/threads/priority-donate-chain-sema.ck	2024-02-09 01:26:31.727968054 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-chain-sema.ck	1970-01-01 00:00:00.000000000 +0000
-@@ -1,46 +0,0 @@
--# -*- perl -*-
--use strict;
--use warnings;
--use tests::tests;
--check_expected ([<<'EOF']);
--(priority-donate-chain-sema) begin
--(priority-donate-chain-sema) main downed semaphore.
--(priority-donate-chain-sema) main should have priority 3.  Actual priority: 3.
--(priority-donate-chain-sema) main should have priority 6.  Actual priority: 6.
--(priority-donate-chain-sema) main should have priority 9.  Actual priority: 9.
--(priority-donate-chain-sema) main should have priority 12.  Actual priority: 12.
--(priority-donate-chain-sema) main should have priority 15.  Actual priority: 15.
--(priority-donate-chain-sema) main should have priority 18.  Actual priority: 18.
--(priority-donate-chain-sema) main should have priority 21.  Actual priority: 21.
--(priority-donate-chain-sema) thread 1 downed semaphore
--(priority-donate-chain-sema) thread 1 should have priority 21. Actual priority: 21
--(priority-donate-chain-sema) thread 2 downed semaphore
--(priority-donate-chain-sema) thread 2 should have priority 21. Actual priority: 21
--(priority-donate-chain-sema) thread 3 downed semaphore
--(priority-donate-chain-sema) thread 3 should have priority 21. Actual priority: 21
--(priority-donate-chain-sema) thread 4 downed semaphore
--(priority-donate-chain-sema) thread 4 should have priority 21. Actual priority: 21
--(priority-donate-chain-sema) thread 5 downed semaphore
--(priority-donate-chain-sema) thread 5 should have priority 21. Actual priority: 21
--(priority-donate-chain-sema) thread 6 downed semaphore
--(priority-donate-chain-sema) thread 6 should have priority 21. Actual priority: 21
--(priority-donate-chain-sema) thread 7 downed semaphore
--(priority-donate-chain-sema) thread 7 should have priority 21. Actual priority: 21
--(priority-donate-chain-sema) thread 7 finishing with priority 21.
--(priority-donate-chain-sema) interloper 7 finished.
--(priority-donate-chain-sema) thread 6 finishing with priority 18.
--(priority-donate-chain-sema) interloper 6 finished.
--(priority-donate-chain-sema) thread 5 finishing with priority 15.
--(priority-donate-chain-sema) interloper 5 finished.
--(priority-donate-chain-sema) thread 4 finishing with priority 12.
--(priority-donate-chain-sema) interloper 4 finished.
--(priority-donate-chain-sema) thread 3 finishing with priority 9.
--(priority-donate-chain-sema) interloper 3 finished.
--(priority-donate-chain-sema) thread 2 finishing with priority 6.
--(priority-donate-chain-sema) interloper 2 finished.
--(priority-donate-chain-sema) thread 1 finishing with priority 3.
--(priority-donate-chain-sema) interloper 1 finished.
--(priority-donate-chain-sema) main finishing with priority 0.
--(priority-donate-chain-sema) end
--EOF
--pass;
-diff -ruN aos_pintos/src/tests/threads/priority-donate-lower-sema.c pintos-solution/src/tests/threads/priority-donate-lower-sema.c
---- aos_pintos/src/tests/threads/priority-donate-lower-sema.c	2024-02-09 01:26:31.715968583 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-lower-sema.c	1970-01-01 00:00:00.000000000 +0000
-@@ -1,46 +0,0 @@
--/* The main thread downs a semaphore.  Then it creates a
--   higher-priority thread that blocks being able to down the semaphore
--   again, causing it to donate its priority to the main thread.  The main
--   thread attempts to lower its priority, which should not take
--   effect until the donation is released. */
--
--#include <stdio.h>
--#include "tests/threads/tests.h"
--#include "threads/init.h"
--#include "threads/synch.h"
--#include "threads/thread.h"
--
--static thread_func down_thread_func;
--
--void test_priority_donate_lower_sema (void)
--{
--  struct semaphore sema;
--
--  /* Make sure our priority is the default. */
--  ASSERT (thread_get_priority () == PRI_DEFAULT);
--
--  sema_init (&sema, 1);
--  sema_down (&sema);
--  thread_create ("down", PRI_DEFAULT + 10, down_thread_func, &sema);
--  msg ("Main thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 10, thread_get_priority ());
--
--  msg ("Lowering base priority...");
--  thread_set_priority (PRI_DEFAULT - 10);
--  msg ("Main thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 10, thread_get_priority ());
--  sema_up (&sema);
--  msg ("down must already have finished.");
--  msg ("Main thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT - 10, thread_get_priority ());
--}
--
--static void down_thread_func (void *sema_)
--{
--  struct semaphore *sema = sema_;
--
--  sema_down (sema);
--  msg ("down: downed the semaphore");
--  sema_up (sema);
--  msg ("down: done");
--}
-diff -ruN aos_pintos/src/tests/threads/priority-donate-lower-sema.ck pintos-solution/src/tests/threads/priority-donate-lower-sema.ck
---- aos_pintos/src/tests/threads/priority-donate-lower-sema.ck	2024-02-09 01:26:31.695969464 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-lower-sema.ck	1970-01-01 00:00:00.000000000 +0000
-@@ -1,16 +0,0 @@
--# -*- perl -*-
--use strict;
--use warnings;
--use tests::tests;
--check_expected ([<<'EOF']);
--(priority-donate-lower-sema) begin
--(priority-donate-lower-sema) Main thread should have priority 41.  Actual priority: 41.
--(priority-donate-lower-sema) Lowering base priority...
--(priority-donate-lower-sema) Main thread should have priority 41.  Actual priority: 41.
--(priority-donate-lower-sema) down: downed the semaphore
--(priority-donate-lower-sema) down: done
--(priority-donate-lower-sema) down must already have finished.
--(priority-donate-lower-sema) Main thread should have priority 21.  Actual priority: 21.
--(priority-donate-lower-sema) end
--EOF
--pass;
-diff -ruN aos_pintos/src/tests/threads/priority-donate-multiple-sema.c pintos-solution/src/tests/threads/priority-donate-multiple-sema.c
---- aos_pintos/src/tests/threads/priority-donate-multiple-sema.c	2024-02-09 01:26:31.687969816 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-multiple-sema.c	1970-01-01 00:00:00.000000000 +0000
-@@ -1,67 +0,0 @@
--/* The main thread downs semaphores A and B, then it creates two
--   higher-priority threads.  Each of these threads blocks
--   being able to down one of the semaphores again and thus donate
--   their priority to the main thread.  The main thread ups the semaphores
--   in turn and relinquishes its donated priorities.
--*/
--
--#include <stdio.h>
--#include "tests/threads/tests.h"
--#include "threads/init.h"
--#include "threads/synch.h"
--#include "threads/thread.h"
--
--static thread_func a_thread_func;
--static thread_func b_thread_func;
--
--void test_priority_donate_multiple_sema (void)
--{
--  struct semaphore a, b;
--
--  /* Make sure our priority is the default. */
--  ASSERT (thread_get_priority () == PRI_DEFAULT);
--
--  sema_init (&a, 1);
--  sema_init (&b, 1);
--
--  sema_down (&a);
--  sema_down (&b);
--
--  thread_create ("a", PRI_DEFAULT + 1, a_thread_func, &a);
--  msg ("Main thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 1, thread_get_priority ());
--
--  thread_create ("b", PRI_DEFAULT + 2, b_thread_func, &b);
--  msg ("Main thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 2, thread_get_priority ());
--
--  sema_up (&b);
--  msg ("Thread b should have just finished.");
--  msg ("Main thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 1, thread_get_priority ());
--
--  sema_up (&a);
--  msg ("Thread a should have just finished.");
--  msg ("Main thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT, thread_get_priority ());
--}
--
--static void a_thread_func (void *sema_)
--{
--  struct semaphore *sema = sema_;
--
--  sema_down (sema);
--  msg ("Thread a downed semaphore a.");
--  sema_up (sema);
--  msg ("Thread a finished.");
--}
--
--static void b_thread_func (void *sema_)
--{
--  struct semaphore *sema = sema_;
--
--  sema_down (sema);
--  msg ("Thread b downed semaphore b.");
--  sema_up (sema);
--  msg ("Thread b finished.");
--}
-diff -ruN aos_pintos/src/tests/threads/priority-donate-multiple-sema.ck pintos-solution/src/tests/threads/priority-donate-multiple-sema.ck
---- aos_pintos/src/tests/threads/priority-donate-multiple-sema.ck	2024-02-09 01:26:31.703969112 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-multiple-sema.ck	1970-01-01 00:00:00.000000000 +0000
-@@ -1,19 +0,0 @@
--# -*- perl -*-
--use strict;
--use warnings;
--use tests::tests;
--check_expected ([<<'EOF']);
--(priority-donate-multiple-sema) begin
--(priority-donate-multiple-sema) Main thread should have priority 32.  Actual priority: 32.
--(priority-donate-multiple-sema) Main thread should have priority 33.  Actual priority: 33.
--(priority-donate-multiple-sema) Thread b downed semaphore b.
--(priority-donate-multiple-sema) Thread b finished.
--(priority-donate-multiple-sema) Thread b should have just finished.
--(priority-donate-multiple-sema) Main thread should have priority 32.  Actual priority: 32.
--(priority-donate-multiple-sema) Thread a downed semaphore a.
--(priority-donate-multiple-sema) Thread a finished.
--(priority-donate-multiple-sema) Thread a should have just finished.
--(priority-donate-multiple-sema) Main thread should have priority 31.  Actual priority: 31.
--(priority-donate-multiple-sema) end
--EOF
--pass;
-diff -ruN aos_pintos/src/tests/threads/priority-donate-nest-sema.c pintos-solution/src/tests/threads/priority-donate-nest-sema.c
---- aos_pintos/src/tests/threads/priority-donate-nest-sema.c	2024-02-09 01:26:31.707968935 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-nest-sema.c	1970-01-01 00:00:00.000000000 +0000
-@@ -1,84 +0,0 @@
--/* Low-priority main thread L downs semaphore A.  Medium-priority
--   thread M then downs semaphore B, but is blocked from being able to down 
--   semaphore A again. High-priority thread H is blocked from being able
--   to down semaphore B again.  Thus, thread H donates its priority to M,
--   which in turn donates it to thread L.
-- */
--
--#include <stdio.h>
--#include "tests/threads/tests.h"
--#include "threads/init.h"
--#include "threads/synch.h"
--#include "threads/thread.h"
--
--struct semas
--{
--  struct semaphore *a;
--  struct semaphore *b;
--};
--
--static thread_func medium_thread_func;
--static thread_func high_thread_func;
--
--void test_priority_donate_nest_sema (void)
--{
--  struct semaphore a, b;
--  struct semas semas;
--
--  /* Make sure our priority is the default. */
--  ASSERT (thread_get_priority () == PRI_DEFAULT);
--
--  sema_init (&a, 1);
--  sema_init (&b, 1);
--
--  sema_down (&a);
--
--  semas.a = &a;
--  semas.b = &b;
--  thread_create ("medium", PRI_DEFAULT + 1, medium_thread_func, &semas);
--  thread_yield ();
--  msg ("Low thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 1, thread_get_priority ());
--
--  thread_create ("high", PRI_DEFAULT + 2, high_thread_func, &b);
--  thread_yield ();
--  msg ("Low thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 2, thread_get_priority ());
--
--  sema_up (&a);
--  thread_yield ();
--  msg ("Medium thread should just have finished.");
--  msg ("Low thread should have priority %d.  Actual priority: %d.", PRI_DEFAULT,
--       thread_get_priority ());
--}
--
--static void medium_thread_func (void *semas_)
--{
--  struct semas *semas = semas_;
--
--  sema_down (semas->b);
--  sema_down (semas->a);
--
--  msg ("Medium thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 2, thread_get_priority ());
--  msg ("Medium thread downed the semaphores.");
--
--  sema_up (semas->a);
--  thread_yield ();
--
--  sema_up (semas->b);
--  thread_yield ();
--
--  msg ("High thread should have just finished.");
--  msg ("Middle thread finished.");
--}
--
--static void high_thread_func (void *sema_)
--{
--  struct semaphore *sema = sema_;
--
--  sema_down (sema);
--  msg ("High thread downed the semaphore.");
--  sema_up (sema);
--  msg ("High thread finished.");
--}
-diff -ruN aos_pintos/src/tests/threads/priority-donate-nest-sema.ck pintos-solution/src/tests/threads/priority-donate-nest-sema.ck
---- aos_pintos/src/tests/threads/priority-donate-nest-sema.ck	2024-02-09 01:26:31.711968759 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-nest-sema.ck	1970-01-01 00:00:00.000000000 +0000
-@@ -1,19 +0,0 @@
--# -*- perl -*-
--use strict;
--use warnings;
--use tests::tests;
--check_expected ([<<'EOF']);
--(priority-donate-nest-sema) begin
--(priority-donate-nest-sema) Low thread should have priority 32.  Actual priority: 32.
--(priority-donate-nest-sema) Low thread should have priority 33.  Actual priority: 33.
--(priority-donate-nest-sema) Medium thread should have priority 33.  Actual priority: 33.
--(priority-donate-nest-sema) Medium thread downed the semaphores.
--(priority-donate-nest-sema) High thread downed the semaphore.
--(priority-donate-nest-sema) High thread finished.
--(priority-donate-nest-sema) High thread should have just finished.
--(priority-donate-nest-sema) Middle thread finished.
--(priority-donate-nest-sema) Medium thread should just have finished.
--(priority-donate-nest-sema) Low thread should have priority 31.  Actual priority: 31.
--(priority-donate-nest-sema) end
--EOF
--pass;
-diff -ruN aos_pintos/src/tests/threads/priority-donate-one-sema.c pintos-solution/src/tests/threads/priority-donate-one-sema.c
---- aos_pintos/src/tests/threads/priority-donate-one-sema.c	2024-02-09 01:26:31.675970345 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-one-sema.c	1970-01-01 00:00:00.000000000 +0000
-@@ -1,55 +0,0 @@
--/* The main thread creates and downs a binary semaphore.  Then it creates two
--   higher-priority threads that block being able to down the semaphore again,
--   causing them to donate their priorities to the main thread.  When the
--   main thread ups the semaphore, the other threads should
--   down it in priority order.
-- */
--
--#include <stdio.h>
--#include "tests/threads/tests.h"
--#include "threads/init.h"
--#include "threads/synch.h"
--#include "threads/thread.h"
--
--static thread_func down1_thread_func;
--static thread_func down2_thread_func;
--
--void test_priority_donate_one_sema (void)
--{
--  struct semaphore sema;
--
--  /* Make sure our priority is the default. */
--  ASSERT (thread_get_priority () == PRI_DEFAULT);
--
--  sema_init (&sema, 1);
--  sema_down (&sema);
--  thread_create ("down1", PRI_DEFAULT + 1, down1_thread_func, &sema);
--  msg ("This thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 1, thread_get_priority ());
--  thread_create ("down2", PRI_DEFAULT + 2, down2_thread_func, &sema);
--  msg ("This thread should have priority %d.  Actual priority: %d.",
--       PRI_DEFAULT + 2, thread_get_priority ());
--  sema_up (&sema);
--  msg ("down2, down1 must already have finished, in that order.");
--  msg ("This should be the last line before finishing this test.");
--}
--
--static void down1_thread_func (void *sema_)
--{
--  struct semaphore *sema = sema_;
--
--  sema_down (sema);
--  msg ("down1: downed the semaphore");
--  sema_up (sema);
--  msg ("down1: done");
--}
--
--static void down2_thread_func (void *sema_)
--{
--  struct semaphore *sema = sema_;
--
--  sema_down (sema);
--  msg ("down2: downed the semaphore");
--  sema_up (sema);
--  msg ("down2: done");
--}
-diff -ruN aos_pintos/src/tests/threads/priority-donate-one-sema.ck pintos-solution/src/tests/threads/priority-donate-one-sema.ck
---- aos_pintos/src/tests/threads/priority-donate-one-sema.ck	2024-02-09 01:26:31.707968935 +0000
-+++ pintos-solution/src/tests/threads/priority-donate-one-sema.ck	1970-01-01 00:00:00.000000000 +0000
-@@ -1,17 +0,0 @@
--# -*- perl -*-
--use strict;
--use warnings;
--use tests::tests;
--check_expected ([<<'EOF']);
--(priority-donate-one-sema) begin
--(priority-donate-one-sema) This thread should have priority 32.  Actual priority: 32.
--(priority-donate-one-sema) This thread should have priority 33.  Actual priority: 33.
--(priority-donate-one-sema) down2: downed the semaphore
--(priority-donate-one-sema) down2: done
--(priority-donate-one-sema) down1: downed the semaphore
--(priority-donate-one-sema) down1: done
--(priority-donate-one-sema) down2, down1 must already have finished, in that order.
--(priority-donate-one-sema) This should be the last line before finishing this test.
--(priority-donate-one-sema) end
--EOF
--pass;
-diff -ruN aos_pintos/src/tests/threads/tests.c pintos-solution/src/tests/threads/tests.c
---- aos_pintos/src/tests/threads/tests.c	2024-02-09 01:26:31.699969288 +0000
-+++ pintos-solution/src/tests/threads/tests.c	2024-03-31 05:11:44.000000000 +0000
-@@ -18,17 +18,12 @@
-     {"alarm-negative", test_alarm_negative},
-     {"priority-change", test_priority_change},
-     {"priority-donate-one", test_priority_donate_one},
--    {"priority-donate-one-sema", test_priority_donate_one_sema},
-     {"priority-donate-multiple", test_priority_donate_multiple},
--    {"priority-donate-multiple-sema", test_priority_donate_multiple_sema},
-     {"priority-donate-multiple2", test_priority_donate_multiple2},
-     {"priority-donate-nest", test_priority_donate_nest},
--    {"priority-donate-nest-sema", test_priority_donate_nest_sema},
-     {"priority-donate-sema", test_priority_donate_sema},
-     {"priority-donate-lower", test_priority_donate_lower},
--    {"priority-donate-lower-sema", test_priority_donate_lower_sema},
-     {"priority-donate-chain", test_priority_donate_chain},
--    {"priority-donate-chain-sema", test_priority_donate_chain_sema},
-     {"priority-fifo", test_priority_fifo},
-     {"priority-preempt", test_priority_preempt},
-     {"priority-sema", test_priority_sema},
-diff -ruN aos_pintos/src/tests/threads/tests.h pintos-solution/src/tests/threads/tests.h
---- aos_pintos/src/tests/threads/tests.h	2024-02-09 01:26:31.675970345 +0000
-+++ pintos-solution/src/tests/threads/tests.h	2024-03-31 05:11:44.000000000 +0000
-@@ -13,17 +13,12 @@
- extern test_func test_alarm_negative;
- extern test_func test_priority_change;
- extern test_func test_priority_donate_one;
--extern test_func test_priority_donate_one_sema;
- extern test_func test_priority_donate_multiple;
--extern test_func test_priority_donate_multiple_sema;
- extern test_func test_priority_donate_multiple2;
- extern test_func test_priority_donate_sema;
- extern test_func test_priority_donate_nest;
--extern test_func test_priority_donate_nest_sema;
- extern test_func test_priority_donate_lower;
--extern test_func test_priority_donate_lower_sema;
- extern test_func test_priority_donate_chain;
--extern test_func test_priority_donate_chain_sema;
- extern test_func test_priority_fifo;
- extern test_func test_priority_preempt;
- extern test_func test_priority_sema;
+Binary files aos_pintos/src/tests/.DS_Store and pintos-solution/src/tests/.DS_Store differ
+Binary files aos_pintos/src/tests/filesys/.DS_Store and pintos-solution/src/tests/filesys/.DS_Store differ
 diff -ruN aos_pintos/src/tests/userprog/Rubric.functionality pintos-solution/src/tests/userprog/Rubric.functionality
---- aos_pintos/src/tests/userprog/Rubric.functionality	2024-02-09 01:26:31.995956245 +0000
+--- aos_pintos/src/tests/userprog/Rubric.functionality	2024-02-29 23:23:14.000000000 +0000
 +++ pintos-solution/src/tests/userprog/Rubric.functionality	2024-03-31 05:11:46.000000000 +0000
 @@ -44,10 +44,10 @@
  3	halt
  
  - Test "symlink" system call.
--5   symlink-bad-target
--5   symlink-check
--5   symlink-remove
--10  symlink-read
+-5	symlink-bad-target
+-5	symlink-check
+-5	symlink-remove
+-10	symlink-read
 +5	sl-bad-target
 +5	sl-check
 +5	sl-remove
@@ -3401,7 +1939,7 @@ diff -ruN aos_pintos/src/tests/userprog/Rubric.functionality pintos-solution/src
  - Test recursive execution of user programs.
  15	multi-recurse
 diff -ruN aos_pintos/src/tests/userprog/sl-read.c pintos-solution/src/tests/userprog/sl-read.c
---- aos_pintos/src/tests/userprog/sl-read.c	2024-02-09 01:26:31.771966115 +0000
+--- aos_pintos/src/tests/userprog/sl-read.c	2024-02-29 23:23:07.000000000 +0000
 +++ pintos-solution/src/tests/userprog/sl-read.c	2024-03-31 05:11:44.000000000 +0000
 @@ -27,12 +27,11 @@
    CHECK ((link_fd = open ("test-link.txt")) > 1, "open \"test-link.txt\"");
@@ -3421,7 +1959,7 @@ diff -ruN aos_pintos/src/tests/userprog/sl-read.c pintos-solution/src/tests/user
 +}
 \ No newline at end of file
 diff -ruN aos_pintos/src/threads/palloc.c pintos-solution/src/threads/palloc.c
---- aos_pintos/src/threads/palloc.c	2024-02-09 01:26:32.155949199 +0000
+--- aos_pintos/src/threads/palloc.c	2024-02-29 23:23:01.000000000 +0000
 +++ pintos-solution/src/threads/palloc.c	2024-03-31 05:11:48.000000000 +0000
 @@ -147,7 +147,8 @@
  {
@@ -3434,7 +1972,7 @@ diff -ruN aos_pintos/src/threads/palloc.c pintos-solution/src/threads/palloc.c
    if (bm_pages > page_cnt)
      PANIC ("Not enough memory in %s for bitmap.", name);
 diff -ruN aos_pintos/src/threads/thread.c pintos-solution/src/threads/thread.c
---- aos_pintos/src/threads/thread.c	2024-02-09 01:26:32.143949727 +0000
+--- aos_pintos/src/threads/thread.c	2024-02-29 23:23:01.000000000 +0000
 +++ pintos-solution/src/threads/thread.c	2024-03-31 05:11:48.000000000 +0000
 @@ -11,8 +11,13 @@
  #include "threads/switch.h"
@@ -3492,7 +2030,7 @@ diff -ruN aos_pintos/src/threads/thread.c pintos-solution/src/threads/thread.c
  
  /* Allocates a SIZE-byte frame at the top of thread T's stack and
 diff -ruN aos_pintos/src/threads/thread.h pintos-solution/src/threads/thread.h
---- aos_pintos/src/threads/thread.h	2024-02-09 02:53:00.333657240 +0000
+--- aos_pintos/src/threads/thread.h	2024-02-29 23:23:01.000000000 +0000
 +++ pintos-solution/src/threads/thread.h	2024-04-30 04:52:23.000000000 +0000
 @@ -4,6 +4,7 @@
  #include <debug.h>
@@ -3525,16 +2063,8 @@ diff -ruN aos_pintos/src/threads/thread.h pintos-solution/src/threads/thread.h
    /* Owned by thread.c. */
    unsigned magic; /* Detects stack overflow. */
  };
-@@ -140,7 +152,4 @@
- int thread_get_recent_cpu (void);
- int thread_get_load_avg (void);
- 
--bool less_tid(const struct list_elem *a, const struct list_elem *b, void *aux);  
--
--
- #endif /* threads/thread.h */
 diff -ruN aos_pintos/src/userprog/exception.c pintos-solution/src/userprog/exception.c
---- aos_pintos/src/userprog/exception.c	2024-02-09 01:26:32.251944971 +0000
+--- aos_pintos/src/userprog/exception.c	2024-02-29 23:23:01.000000000 +0000
 +++ pintos-solution/src/userprog/exception.c	2024-03-31 05:11:48.000000000 +0000
 @@ -1,4 +1,5 @@
  #include "userprog/exception.h"
@@ -3561,7 +2091,7 @@ diff -ruN aos_pintos/src/userprog/exception.c pintos-solution/src/userprog/excep
 +  exit(-1);
  }
 diff -ruN aos_pintos/src/userprog/process.c pintos-solution/src/userprog/process.c
---- aos_pintos/src/userprog/process.c	2024-02-09 01:26:32.243945324 +0000
+--- aos_pintos/src/userprog/process.c	2024-02-29 23:23:00.000000000 +0000
 +++ pintos-solution/src/userprog/process.c	2024-03-31 05:11:48.000000000 +0000
 @@ -8,6 +8,7 @@
  #include "userprog/gdt.h"
@@ -3934,7 +2464,7 @@ diff -ruN aos_pintos/src/userprog/process.c pintos-solution/src/userprog/process
    return success;
  }
 diff -ruN aos_pintos/src/userprog/process.h pintos-solution/src/userprog/process.h
---- aos_pintos/src/userprog/process.h	2024-02-09 01:26:32.259944619 +0000
+--- aos_pintos/src/userprog/process.h	2024-02-29 23:23:00.000000000 +0000
 +++ pintos-solution/src/userprog/process.h	2024-03-31 05:11:50.000000000 +0000
 @@ -2,7 +2,67 @@
  #define USERPROG_PROCESS_H
@@ -4005,7 +2535,7 @@ diff -ruN aos_pintos/src/userprog/process.h pintos-solution/src/userprog/process
  int process_wait (tid_t);
  void process_exit (void);
 diff -ruN aos_pintos/src/userprog/syscall.c pintos-solution/src/userprog/syscall.c
---- aos_pintos/src/userprog/syscall.c	2024-02-09 01:26:32.255944795 +0000
+--- aos_pintos/src/userprog/syscall.c	2024-02-29 23:23:00.000000000 +0000
 +++ pintos-solution/src/userprog/syscall.c	2024-04-30 04:51:58.000000000 +0000
 @@ -1,19 +1,670 @@
  #include "userprog/syscall.h"
@@ -4683,7 +3213,7 @@ diff -ruN aos_pintos/src/userprog/syscall.c pintos-solution/src/userprog/syscall
 +    return result;
 +}
 diff -ruN aos_pintos/src/userprog/syscall.h pintos-solution/src/userprog/syscall.h
---- aos_pintos/src/userprog/syscall.h	2024-02-09 01:26:32.263944443 +0000
+--- aos_pintos/src/userprog/syscall.h	2024-02-29 23:23:00.000000000 +0000
 +++ pintos-solution/src/userprog/syscall.h	2024-04-30 04:48:45.000000000 +0000
 @@ -3,6 +3,28 @@
  
