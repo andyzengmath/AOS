@@ -27,5 +27,4 @@ bool isdir (int fd);
 int inumber (int fd);
 int stat (const char *pathname, void *buf);
 
-
 #endif /* userprog/syscall.h */

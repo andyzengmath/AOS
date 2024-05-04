@@ -27,19 +27,19 @@ struct stat
 
 void filesys_init (bool format);
 void filesys_done (void);
-// bool filesys_create (const char *name, off_t initial_size);
-// bool filesys_create_2 (const char *name, off_t initial_size, bool is_dir);
-bool filesys_create (const char *name, off_t initial_size, bool is_dir);
+bool filesys_create (const char *name, off_t initial_size);
 struct file *filesys_open (const char *name);
 bool filesys_remove (const char *name);
 
 /* Symbolic link creation */
 bool filesys_symlink (char *target, char *linkpath);
 
-bool filesys_create_dir (const char *name);
-struct dir *filesys_open_dir (const char *name);
-struct inode *filesys_open_inode (const char *name);
-bool filesys_chdir (const char *name);
-bool valid_filename(const char *name);
+// P4 tryout:
+// bool filesys_create (const char *name, off_t initial_size, bool is_dir);
+// bool filesys_create_dir (const char *name);
+// struct dir *filesys_open_dir (const char *name);
+// struct inode *filesys_open_inode (const char *name);
+// bool filesys_chdir (const char *name);
+// bool valid_filename(const char *name);
 
 #endif /* filesys/filesys.h */

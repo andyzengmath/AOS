@@ -199,7 +199,6 @@ tid_t thread_create (const char *name, int priority, thread_func *function,
   sf->ebp = 0;
 
   t->parent = thread_current (); // Creating thread is parent of new thread
-  t->cwd = thread_current()->cwd; 
 
   // Add new thread to children struct of parent
   struct child *child = malloc (sizeof (struct child));

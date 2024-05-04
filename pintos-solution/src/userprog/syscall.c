@@ -17,12 +17,12 @@
 #include "filesys/filesys.h"
 #include "filesys/file.h"
 #include "filesys/inode.h"
-#include "filesys/directory.h"
 #include "userprog/gdt.h"
 #include "threads/flags.h"
 #include "devices/input.h"
 #include "devices/block.h"
 
+// P2 solution:
 static void syscall_handler (struct intr_frame *);
 static bool valid_ptr (void *);
 
@@ -175,8 +175,9 @@ static void syscall_handler (struct intr_frame *f UNUSED)
         char *linkpath = *((char **) f->esp + 2);
         f->eax = symlink (target, linkpath);
         break;
-
-    case SYS_CHDIR: // 15
+      
+      // P4 tryout:
+      case SYS_CHDIR: // 15
       if (check_args (f->esp, 1)) {
         exit (-1);
       }
@@ -313,10 +314,8 @@ bool create (const char *file, unsigned initial_size)
       exit (-1);
     }
 
-  // if (!page_available()) return false;
-
   sema_down (&filesys_mutex);
-  bool opened = filesys_create (file, initial_size, false);
+  bool opened = filesys_create (file, initial_size);
   sema_up (&filesys_mutex);
 
   return opened;
@@ -363,15 +362,7 @@ int open (const char *filename)
       return -1;
     }
 
-  struct inode *inode = file_get_inode(file);
-  if(inode != NULL && inode_is_dir(inode)) {
-    // file->dir = dir_open(inode);
-    file->dir = dir_open( inode_reopen(inode) );
-  }
-  else file->dir = NULL;
-
   fds[fd] = file;
-
   return fd;
 }
 
@@ -495,7 +486,6 @@ void close (int fd)
     }
   sema_down (&filesys_mutex);
   file_close (fds[fd]);
-  if(fds[fd]->dir) dir_close(fds[fd]->dir);
   fds[fd] = NULL;
   sema_up (&filesys_mutex);
 }
@@ -525,6 +515,7 @@ bool valid_ptr (void *ptr)
 }
 
 
+// P4 tryout:
 /* System Call: bool chdir (const char *dir) */
 bool chdir (const char *dir)
 {
@@ -532,19 +523,19 @@ bool chdir (const char *dir)
     return false;
   }
 
-  sema_down (&filesys_mutex);
-  bool ret = filesys_chdir (dir);
-  // if (directory == NULL) {
-  //   sema_up (&filesys_mutex);
-  //   return false;
-  // }
+  // sema_down (&filesys_mutex);
+  // bool ret = filesys_chdir (dir);
+  // // if (directory == NULL) {
+  // //   sema_up (&filesys_mutex);
+  // //   return false;
+  // // }
 
-  // struct thread *cur = thread_current ();
-  // dir_close (cur->cwd);  // Close the current working directory
-  // cur->cwd = directory;  // Update the current working directory
-  sema_up (&filesys_mutex);
+  // // struct thread *cur = thread_current ();
+  // // dir_close (cur->cwd);  // Close the current working directory
+  // // cur->cwd = directory;  // Update the current working directory
+  // sema_up (&filesys_mutex);
 
-  return ret;
+  return true;
 }
 
 /* System Call: bool mkdir (const char *dir) */
@@ -553,14 +544,12 @@ bool mkdir (const char *dir)
   if (!valid_ptr ((void *) dir)) {
     return false;
   }
-
-  // if (!page_available()) return false;
   
-  sema_down (&filesys_mutex);
-  bool ret = filesys_create (dir, 0, true);
-  sema_up (&filesys_mutex);
+  // sema_down (&filesys_mutex);
+  // bool ret = filesys_create (dir, 0, true);
+  // sema_up (&filesys_mutex);
 
-  return ret;
+  return true;
 }
 
 /* System Call: bool readdir (int fd, char *name) */
@@ -577,28 +566,28 @@ bool readdir (int fd, char *name)
     return false;
   }
 
-  struct inode *inode = file_get_inode(file);
-  if(inode == NULL) {
-    sema_up (&filesys_mutex);
-    return false;
-  }
+  // struct inode *inode = file_get_inode(file);
+  // if(inode == NULL) {
+  //   sema_up (&filesys_mutex);
+  //   return false;
+  // }
 
-  if(! inode_is_dir(inode)) {
-    sema_up (&filesys_mutex);
-    return false;
-  }
+  // if(! inode_is_dir(inode)) {
+  //   sema_up (&filesys_mutex);
+  //   return false;
+  // }
 
-  struct dir *dir = dir_open (inode);
-  if (dir == NULL) {
-    sema_up (&filesys_mutex);
-    return false;
-  }
+  // struct dir *dir = dir_open (inode);
+  // if (dir == NULL) {
+  //   sema_up (&filesys_mutex);
+  //   return false;
+  // }
 
-  bool success = dir_readdir (dir, name);
-  // dir_close (dir);
+  // bool success = dir_readdir (dir, name);
+  // // dir_close (dir);
   sema_up (&filesys_mutex);
 
-  return success;
+  return true;
 }
 
 /* System Call: bool isdir (int fd) */
@@ -615,10 +604,10 @@ bool isdir (int fd)
     return false;
   }
   
-  bool ret = inode_is_dir (file_get_inode (file));
+  // bool ret = inode_is_dir (file_get_inode (file));
   sema_up (&filesys_mutex);
 
-  return ret;
+  return true;
 }
 
 /* System Call: int inumber (int fd) */
@@ -635,10 +624,10 @@ int inumber (int fd)
     return -1;
   }
   
-  int ret = (int) inode_get_inumber (file_get_inode (file));
+  // int ret = (int) inode_get_inumber (file_get_inode (file));
   sema_up (&filesys_mutex);
 
-  return ret;
+  return 0;
 }
 
 /* System Call: int stat (char *pathname, void *buf) */
@@ -662,28 +651,20 @@ int stat(const char *pathname, void *buf)
     }
 
     /* Open the inode corresponding to the pathname */
-    inode = filesys_open_inode(pathname);
-    if (inode != NULL)
-    {
-        /* Fill the stat structure with inode information */
-        stat_buf->logical_size = inode_length(inode);
-        stat_buf->physical_size = inode_length_physical(inode);
-        stat_buf->inode_number = inode_get_inumber(inode);
-        stat_buf->blocks = inode_get_blocks(inode);
+    // inode = filesys_open_inode(pathname);
+    // if (inode != NULL)
+    // {
+    //     /* Fill the stat structure with inode information */
+    //     stat_buf->logical_size = inode_length(inode);
+    //     stat_buf->physical_size = inode_length_physical(inode);
+    //     stat_buf->inode_number = inode_get_inumber(inode);
+    //     stat_buf->blocks = inode_get_blocks(inode);
 
-        /* Copy the stat structure to the user-provided buffer */
-        memcpy(buf, stat_buf, sizeof(struct stat));
-    }
+    //     /* Copy the stat structure to the user-provided buffer */
+    //     memcpy(buf, stat_buf, sizeof(struct stat));
+    // }
 
     free(stat_buf); // Free allocated memory
     sema_up (&filesys_mutex);
     return result;
 }
-
-// static bool page_available(void) {
-//   // dirty hack: check if there remains a free page
-//   void *p = palloc_get_page (0);
-//   if(p == NULL) return false;
-//   else palloc_free_page (p);
-//   return true;
-// }

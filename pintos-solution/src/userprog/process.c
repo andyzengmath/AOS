@@ -74,18 +74,10 @@ static void start_process (void *filename)
     palloc_free_page (filename);
 
   thread_current ()->parent->success = success;
-  // thread_current ()->cwd = thread_current ()->parent->cwd;
   sema_up (&thread_current ()->parent->child_created);
 
   /* If load failed, quit. */
   palloc_free_page (filename);
-
-  if (thread_current()->parent != NULL && thread_current()->parent->cwd != NULL) {
-    thread_current()->cwd = dir_reopen(thread_current()->parent->cwd);
-  } else {
-    thread_current()->cwd = dir_open_root();
-  }
-
   if (!success)
     {
       exit (-1);
@@ -316,9 +308,7 @@ bool load (const char *args, void (**eip) (void), void **esp)
 
 done:
   /* We arrive here whether the load is successful or not. */
-  if (!success) {
-    file_close (file);
-  }
+  file_close (file);
   return success;
 }
 
